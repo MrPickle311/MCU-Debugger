@@ -58,7 +58,6 @@ void FRAM_CircularBuffer_clear(FRAM_CircularBuffer buffer)
 //extracted pointer advancment logic
 static inline void _advancePtr(FRAM_CircularBuffer buffer)
 {
-
 	if(buffer->is_full_)
 		if(++buffer->current_pop_adr_ ==  FRAM_CircularBuffer_getCapacity(buffer))
 			buffer->current_pop_adr_ = 0;
@@ -66,8 +65,8 @@ static inline void _advancePtr(FRAM_CircularBuffer buffer)
 	if(++buffer->current_push_adr_ == FRAM_CircularBuffer_getCapacity(buffer))
 		buffer->current_push_adr_ = 0;
 	
-	buffer->is_full_ = buffer->current_push_adr_ == buffer->current_pop_adr_;
-	
+	//buffer->is_full_ = buffer->current_push_adr_ == buffer->current_pop_adr_;
+	buffer->is_full_ = buffer->current_push_adr_ == (FRAM_CircularBuffer_getCapacity(buffer) - 1);
 }
 
 //this helper function is called when when removing a value from the buffer
@@ -75,7 +74,8 @@ static inline void _retreatPtr(FRAM_CircularBuffer buffer)
 {
 	buffer->is_full_ = false;
 	
-	if(++buffer->current_pop_adr_ == FRAM_CircularBuffer_getCapacity(buffer))
+	//if(++buffer->current_pop_adr_ == FRAM_CircularBuffer_getCapacity(buffer))CHANGE
+	if(++buffer->current_pop_adr_ == buffer->current_push_adr_)
 		buffer->current_pop_adr_ = 0;
 }
 
@@ -100,13 +100,13 @@ void FRAM_CircularBuffer_forcePush(FRAM_CircularBuffer buffer,byte_t data)
 	_advancePtr(buffer);
 }
 
-enum OperationStatus FRAM_CircularBuffer_pop(FRAM_CircularBuffer buffer,byte_t* dest)
+enum OperationStatus FRAM_CircularBuffer_pop(FRAM_CircularBuffer buffer, byte_t* dest)
 {
 	enum OperationStatus status = Failure;
 	
 	if (!FRAM_CircularBuffer_isEmpty(buffer))
 	{
-		FRAM_readRandomByte(buffer->beg_adr_ + buffer->current_pop_adr_);
+		*dest = FRAM_readRandomByte(buffer->beg_adr_ + buffer->current_pop_adr_);
 		_retreatPtr(buffer);
 		status = Success;
 	}
@@ -124,20 +124,31 @@ bool FRAM_CircularBuffer_isFull(FRAM_CircularBuffer buffer)
 	return buffer->is_full_;
 }
 
-length_t FRAM_CircularBuffer_getCapacity(FRAM_CircularBuffer buffer)
+large_length_t FRAM_CircularBuffer_getCapacity(FRAM_CircularBuffer buffer)
 {
 	return buffer->end_adr_ - buffer->beg_adr_ + 1;
 }
 
-length_t FRAM_CircularBuffer_getFillLevel(FRAM_CircularBuffer buffer)
+large_length_t FRAM_CircularBuffer_getFillLevel(FRAM_CircularBuffer buffer)
 {
-	length_t size = FRAM_CircularBuffer_getCapacity(buffer);
+	//large_length_t size = FRAM_CircularBuffer_getCapacity(buffer);
+	//
+	//if(!buffer->is_full_)
+	//{
+	//	if(buffer->current_push_adr_ >= buffer->current_pop_adr_)
+	//		size = buffer->current_push_adr_ - buffer->current_pop_adr_;
+	//	else size = FRAM_CircularBuffer_getCapacity(buffer) + buffer->current_push_adr_ - buffer->current_pop_adr_;
+	//}
 	
-	if(!buffer->is_full_)
-	{
-		if(buffer->current_push_adr_ >= buffer->current_pop_adr_)
-			size = buffer->current_push_adr_ - buffer->current_pop_adr_;
-		else size = FRAM_CircularBuffer_getCapacity(buffer) + buffer->current_push_adr_ - buffer->current_pop_adr_;
-	}
-	return size;
+	return buffer->current_push_adr_;
+}
+
+bool FRAM_CircularBuffer_IOPosMatch(FRAM_CircularBuffer buffer)
+{
+	return buffer->current_pop_adr_ == buffer->current_push_adr_;
+}
+
+void FRAM_CircularBuffer_injectSavePosition(FRAM_CircularBuffer buffer,large_length_t pos)
+{
+	buffer->current_push_adr_ = pos;
 }

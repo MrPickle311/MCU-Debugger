@@ -5,6 +5,7 @@
 #include <avr/interrupt.h>
 #include <util/atomic.h>
 #include "../drivers/core/timer.h"
+#include "../drivers/core/bit_utils.h"
 
 // Buttons connected to port D
 #define BUTTON_PORT PORTD

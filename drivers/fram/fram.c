@@ -63,3 +63,14 @@ void FRAM_readByteSequence(byte_t* target,length_t size,large_length_t start_add
 		++start_address;
 	}
 }
+
+void FRAM_readText(char* target,large_length_t start_address)
+{
+	uint8_t array_idx = 0;
+	target[array_idx] = (char)FRAM_readRandomByte(start_address);
+	while(target[array_idx])
+	{
+		++array_idx;
+		target[array_idx] = (char)FRAM_readRandomByte(start_address + array_idx);
+	}
+}

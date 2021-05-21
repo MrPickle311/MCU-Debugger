@@ -52,7 +52,7 @@ void PORT_setPinAsInput(port_config_t* port_config,port_state_t* port_state,enum
 {
 	CLEAR_BIT_AT(*port_config,pin_nmbr);
 	
-	if(port_config == PullUp)
+	if(input_config == PullUp)
 		SET_BIT_AT(*port_state,pin_nmbr);
 	else CLEAR_BIT_AT(*port_state,pin_nmbr);
 }

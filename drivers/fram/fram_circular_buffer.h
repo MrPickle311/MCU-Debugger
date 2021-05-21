@@ -34,8 +34,12 @@ bool FRAM_CircularBuffer_isEmpty(FRAM_CircularBuffer buffer);
 
 bool FRAM_CircularBuffer_isFull(FRAM_CircularBuffer buffer);
 
-length_t FRAM_CircularBuffer_getCapacity(FRAM_CircularBuffer buffer);
+large_length_t FRAM_CircularBuffer_getCapacity(FRAM_CircularBuffer buffer);
 
-length_t FRAM_CircularBuffer_getFillLevel(FRAM_CircularBuffer buffer);
+large_length_t FRAM_CircularBuffer_getFillLevel(FRAM_CircularBuffer buffer);
+
+bool FRAM_CircularBuffer_IOPosMatch(FRAM_CircularBuffer buffer);
+
+void FRAM_CircularBuffer_injectSavePosition(FRAM_CircularBuffer buffer,large_length_t pos);
 
 #endif /* FRAM_CIRCULAR_BUFFER_H_ */

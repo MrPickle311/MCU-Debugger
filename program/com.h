@@ -16,6 +16,7 @@
 #include <util/delay.h>
 #include <stdbool.h>
 #include "debounce.h"
+#include "../drivers/lcd/GUI_Paint.h"
 
 //debugger settings
 

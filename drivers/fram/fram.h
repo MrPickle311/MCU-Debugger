@@ -43,6 +43,7 @@ byte_t FRAM_readRandomByte(large_length_t address);
 
 void FRAM_readByteSequence(byte_t* target,length_t size,large_length_t start_address);
 
+void FRAM_readText(char* target,large_length_t start_address);
 
 /*
 void FRAM_readBytesSequence(byte_t* byte_array,length_t count_of_bytes ,address_16bit_t start_address)

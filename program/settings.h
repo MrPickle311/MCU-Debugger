@@ -21,11 +21,17 @@ volatile uint8_t current_breakpoint_to_load;
 
 volatile FRAM_CircularBuffer fram_buffer;
 
+volatile uint16_t* current_fram_push_positions;
+
 #define GET_BREAKPOINT_START_ADDRESS(breakpoint_nmbr)	( FRAM_SIZE / breakpoints_total_nmbr ) * breakpoint_nmbr
 
 #define GET_BREAKPOINT_END_ADDRESS(breakpoint_nmbr)		( FRAM_SIZE / breakpoints_total_nmbr ) * ( breakpoint_nmbr + 1 ) - 1
 
 #define GET_BREAKPOINT_CURR_POS()						breakpoint_current_pos		
+
+#define UPDATE_SAVE_POS()	current_fram_push_positions[current_breakpoint_to_save] = FRAM_CircularBuffer_getFillLevel(fram_buffer)
+
+void resetLoadBreakpoint();
 
 void goToNextSaveBreakpoint();
 

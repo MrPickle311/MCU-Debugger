@@ -91,7 +91,7 @@ void initTimer1()
 uint8_t transfer(uint8_t data)
 {
 	SPDR0 = data;
-	asm volatile("nop");//czekaj jeden takt zegara 
+	asm volatile("nop");//wait a clock tact
 	while (!(SPSR0 & _BV(SPIF))) ; // wait
 	return SPDR0;
 }
@@ -103,54 +103,32 @@ void LCD_analogWrite(uint8_t value)
 
 void GPIO_Init()
 {
-	SET_BIT_AT(DDRB,0);
-	SET_BIT_AT(DDRB,1);
-	SET_BIT_AT(DDRB,2);
-	SET_BIT_AT(DDRD,7);
+	SET_BIT_AT(DDRB,DDB0);
+	SET_BIT_AT(DDRB,DDB1);
+	SET_BIT_AT(DDRB,DDB2);
+	SET_BIT_AT(DDRD,DDD7);
 	initTimer1();
 	LCD_analogWrite(140);
 }
 
 void Config_Init()
- {
-
-  GPIO_Init();
-  
-  //Serial
-  //Serial.begin(115200);
-  
-  //spi
-  
-  //SPI.setDataMode(SPI_MODE3);
-  SPCR0 |= _BV(CPOL) | _BV(CPHA);
-  
-  //SPI.setBitOrder(MSBFIRST);
-  SPCR0 &= ~(_BV(DORD)); 
-  
-  
-  //SPI.setClockDivider(SPI_CLOCK_DIV2);
-  //SPSR |= _BV(SPI2X);
-  //SPCR &= ~_BV(SPR0);
-  //SPCR &= ~_BV(SPR1);
-  SPCR0 = (SPCR0 & ~0x03  ) | (0x04  & 0x03  );
-  SPSR0 = (SPSR0 & ~0x01  ) | ((0x04  >> 2) & 0x01  );
-  
-  //SPI.begin();
-  SPCR0 |= _BV(MSTR);
-  SPCR0 |= _BV(SPE);
-  
-  SET_BIT_AT(PORTB,DDB2);//ss
-  //SET_BIT_AT(PORTB,DDB5);
-  
-  SET_BIT_AT(DDRB,DDB3);
-  
-  //SET_BIT_AT(PORTB,DDB3);
-  //SET_BIT_AT(PORTB,DDB4);
-  //SET_BIT_AT(PORTB,DDB5);
-  
-  
-  SET_BIT_AT(DDRB,DDB5);
-  
-   //setBitsAt(&DDRB , DDB3 , DDB5);//sck,mosi
-   
-  }
+{
+     GPIO_Init();
+     
+     SPCR0 |= _BV(CPOL) | _BV(CPHA);
+     
+     SPCR0 &= ~(_BV(DORD)); 
+     
+     //SPCR0 = ( SPCR0 & ~0x03  ) | ( 0x04  & 0x03  );
+	 
+	 //SPCR0 = ( SPCR0 & ~0x03  );
+	 
+     //SPSR0 = (SPSR0 & ~0x01  ) | ((0x04  >> 2) & 0x01  );
+	 
+     SPCR0 |= _BV(MSTR);
+     SPCR0 |= _BV(SPE);
+     
+     SET_BIT_AT(PORTB,DDB2);//ss
+     SET_BIT_AT(DDRB,DDB3);
+     SET_BIT_AT(DDRB,DDB5); 
+}

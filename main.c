@@ -17,6 +17,7 @@
 #include "program/debounce.h"
 #include "program/menu.h"
 #include "program/com.h"
+#include "tests/fram_buffer_test.h"
 
 volatile address_16bit_t fram_push_adr = {0x0};
 volatile address_16bit_t fram_pop_adr  = {0x0};
@@ -54,6 +55,7 @@ void configureLCD()
 void configurePORTS()
 {
 	PORT_setPinAsOutput(PORT_CONFIG(E),2);
+	PORT_setPinHigh(PORT_STATE(E),2);
 }
 
 void configureDebouncingTimer()
@@ -62,46 +64,38 @@ void configureDebouncingTimer()
 	setup.prescaler_ = TIMER_Async_Prescaler256;
 	setup.mode_ = TIMER_8Bit_Normal;
 	setup.interrupt_mode_ = TIMER_8Bit_Overflow;
-	TIMER_haltAsynchronousTimer();
+	DISABLE_BUTTONS();
 	TIMER_2_Init(setup,false);
+}
+
+void wipeFRAM()
+{
+	for(uint16_t i = 0 ; i < FRAM_SIZE; ++i)
+		FRAM_writeSingleByte(0,i);
 }
 
 int main(void)
 {
-    configureTWISlave();
-    configureTWIMaster();
+	configurePORTS();
+	
+	configureTWISlave();
+	configureTWIMaster();
 	configureLCD();
 	configurePORTS();
 	configureDebouncingTimer();
 	debounce_init();
 	
-	_delay_ms(500);
+	//wipeFRAM();
+	_delay_ms(300);
 	
 	sei();
-	
-	MENU_navigate();
-    while (1) 
-    {
-		if(data_transfer_flag)
-		{
-			if(TWI_Buffer_Is_DataIsReadyToProcess(TWI0_Buffer))
-			{
-				
-				/*
-				switch(TWI1_Buffer.body_[0])
-				{
-					case 
-				}*/
-				
-				//Paint_DrawNum(16,220,TWI0_Buffer.body_[0],  &Font16, BLACK, WHITE);
-				//Paint_DrawNum(16,236,TWI0_Buffer.body_[1],  &Font16, BLACK, WHITE);
-				//Paint_DrawNum(16,252,TWI0_Buffer.body_[2],  &Font16, BLACK, WHITE);
-				//Paint_DrawNum(16,268,TWI0_Buffer.body_[3],  &Font16, BLACK, WHITE);
-				TWI0_emptyBuffer();
-				//data_transfer_flag = 0;
-			}
-		}
-		//else 
-    }
+	//fram_test1();
+	//fram_test2();
+	//fram_test3();
+	//fram_test4();
+    while (1)
+	{
+		MENU_navigate();
+	}
 }
 
