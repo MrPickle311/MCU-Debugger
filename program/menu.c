@@ -40,26 +40,43 @@ void MENU_Browser_printDataCell(uint8_t start_line)
 
 volatile char string_buffer[40];
 volatile uint8_t sb_idx = 0;
-volatile uint16_t temp_value = 0;
-
+volatile uint32_t temp_value = 0;
+volatile uint8_t var_size = 0;
+volatile uint8_t helper_var = 0;
+volatile char number_str_buffer[10];
 
 void MENU_printData(uint8_t line)
 {
+	//reset
 	sb_idx = 0;
 	temp_value =  0;
 	string_buffer[0] = 0;
-	FRAM_CircularBuffer_pop(fram_buffer,&temp_value);
+	var_size = 0;
+	helper_var = 0;
+	number_str_buffer[0] = 0;
+	
+	FRAM_CircularBuffer_pop(fram_buffer,&var_size);//get var size
+	
+	for_N(i,var_size)
+	{
+		FRAM_CircularBuffer_pop(fram_buffer,&helper_var);
+		temp_value |= helper_var << ( 8 * i ) ;
+	}
 	
 	FRAM_CircularBuffer_pop(fram_buffer,&string_buffer[sb_idx]);
 	
 	while(string_buffer[sb_idx++])
 		FRAM_CircularBuffer_pop(fram_buffer,&string_buffer[sb_idx]);
-
+	
 	Paint_DrawString_EN(16*4,16*line*3      -27 + (line - 1)*3, "                  ",&Font16,BLACK,WHITE);
 	Paint_DrawString_EN(16*4,16*line*3 + 32 -27 + (line - 1)*3,"                  ",&Font16,BLACK,WHITE);
 	
 	Paint_DrawString_EN(16*4,16*line*3      -27 + (line - 1)*3, string_buffer,&Font16,BLACK,WHITE);
-	Paint_DrawNum(16*4,16*line*3 + 32 -27 + (line - 1)*3 , temp_value,&Font16,BLACK,WHITE);
+	
+	sprintf(number_str_buffer,"0x%08x", temp_value);
+	
+	Paint_DrawString_EN(16*4,16*line*3 + 32 -27 + (line - 1)*3 , number_str_buffer,&Font16,BLACK,WHITE);
+	//Paint_DrawNum(16*4,16*line*3 + 32 -27 + (line - 1)*3 , temp_value,&Font16,BLACK,WHITE);
 }
 
 void MENU_printDataPage()
@@ -207,7 +224,8 @@ void MENU_printChoiceMenu()
 	Paint_DrawString_EN(16*1,16*11,"Load next breakpoint",&Font16,BLACK,WHITE);
 	Paint_DrawRectangle(16*1 - 5, 16*10 - 5, 16*6+16*9, 16*10 + 16*2,WHITE,2,DRAW_FILL_EMPTY);
 	
-	Paint_DrawNum(16*1,16*15,breakpoints_total_nmbr,&Font16,BLACK,WHITE);
+	Paint_DrawString_EN(0,16*15,"Breakpoints: ",&Font16,BLACK,WHITE);
+	Paint_DrawNum(16*10,16*15,breakpoints_total_nmbr,&Font16,BLACK,WHITE);
 }
 
 void MENU_printStartMenu()

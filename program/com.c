@@ -16,18 +16,26 @@ void COM_sendDebugSignal()
 
 void COM_getVariable()
 {
-	FRAM_CircularBuffer_safePush(fram_buffer,TWI_Buffer_AtByte(TWI0_Buffer,1));//value
+	FRAM_CircularBuffer_safePush(fram_buffer,TWI_Buffer_AtByte(TWI0_Buffer,1));//sizeof
 	
-	TWI_Buffer_GoNextByte(TWI0_Buffer);
-	TWI_Buffer_GoNextByte(TWI0_Buffer);
-	uint8_t i = 2;
-	while(TWI_Buffer_AtByte(TWI0_Buffer,i))//name, while name[i] != '\0'
+	for_N(i,TWI_Buffer_AtByte(TWI0_Buffer,1))
+		FRAM_CircularBuffer_safePush(fram_buffer,TWI_Buffer_AtByte(TWI0_Buffer,2 + i));
+	
+	TWI_Buffer_GoNextByte(TWI0_Buffer);//ommit a command
+	TWI_Buffer_GoNextByte(TWI0_Buffer);//ommit a variable size
+	
+	for_N(i,TWI_Buffer_AtByte(TWI0_Buffer,1))
+		TWI_Buffer_GoNextByte(TWI0_Buffer);//ommit a variable body
+
+
+	uint8_t i = 2 + TWI_Buffer_AtByte(TWI0_Buffer,1);
+	while(TWI_Buffer_AtByte(TWI0_Buffer,i))//name sending, while name[i] != '\0'
 	{
 		FRAM_CircularBuffer_safePush(fram_buffer,TWI_Buffer_AtByte(TWI0_Buffer,i));
 		++i;
 	}
 
-	FRAM_CircularBuffer_safePush(fram_buffer,TWI_Buffer_AtCurrentByte(TWI0_Buffer));// '\0' , ewentualnie usun¹æ
+	FRAM_CircularBuffer_safePush(fram_buffer,TWI_Buffer_AtCurrentByte(TWI0_Buffer));// '\0' 
 }
 
 void COM_getArray()

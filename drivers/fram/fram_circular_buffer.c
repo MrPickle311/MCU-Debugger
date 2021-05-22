@@ -65,7 +65,6 @@ static inline void _advancePtr(FRAM_CircularBuffer buffer)
 	if(++buffer->current_push_adr_ == FRAM_CircularBuffer_getCapacity(buffer))
 		buffer->current_push_adr_ = 0;
 	
-	//buffer->is_full_ = buffer->current_push_adr_ == buffer->current_pop_adr_;
 	buffer->is_full_ = buffer->current_push_adr_ == (FRAM_CircularBuffer_getCapacity(buffer) - 1);
 }
 
@@ -74,7 +73,6 @@ static inline void _retreatPtr(FRAM_CircularBuffer buffer)
 {
 	buffer->is_full_ = false;
 	
-	//if(++buffer->current_pop_adr_ == FRAM_CircularBuffer_getCapacity(buffer))CHANGE
 	if(++buffer->current_pop_adr_ == buffer->current_push_adr_)
 		buffer->current_pop_adr_ = 0;
 }
@@ -131,15 +129,6 @@ large_length_t FRAM_CircularBuffer_getCapacity(FRAM_CircularBuffer buffer)
 
 large_length_t FRAM_CircularBuffer_getFillLevel(FRAM_CircularBuffer buffer)
 {
-	//large_length_t size = FRAM_CircularBuffer_getCapacity(buffer);
-	//
-	//if(!buffer->is_full_)
-	//{
-	//	if(buffer->current_push_adr_ >= buffer->current_pop_adr_)
-	//		size = buffer->current_push_adr_ - buffer->current_pop_adr_;
-	//	else size = FRAM_CircularBuffer_getCapacity(buffer) + buffer->current_push_adr_ - buffer->current_pop_adr_;
-	//}
-	
 	return buffer->current_push_adr_;
 }
 

@@ -81,11 +81,12 @@ uint8_t LCD_digitalRead(uint8_t pin_nr)
 	}
 }
 
-void initTimer1()
+void initTimer1()//pwm mode
 {
-	TCCR1A |= (_BV(COM1A1));
-	TCCR1A |= (_BV(WGM10));
-	TCCR1B = _BV(WGM12) | _BV(CS10);
+	SET_BIT_AT(TCCR1A, COM1A1);
+	SET_BIT_AT(TCCR1A, WGM10);
+	SET_BIT_AT(TCCR1B, WGM12);
+	SET_BIT_AT(TCCR1B, CS10);
 }
 
 uint8_t transfer(uint8_t data)
@@ -115,19 +116,16 @@ void Config_Init()
 {
      GPIO_Init();
      
-     SPCR0 |= _BV(CPOL) | _BV(CPHA);
+	 SET_BIT_AT(SPCR0, CPOL);
+	 SET_BIT_AT(SPCR0, CPHA);
      
-     SPCR0 &= ~(_BV(DORD)); 
-     
-     //SPCR0 = ( SPCR0 & ~0x03  ) | ( 0x04  & 0x03  );
+	 CLEAR_BIT_AT(SPCR0, DORD);
 	 
-	 //SPCR0 = ( SPCR0 & ~0x03  );
+	 SET_BIT_AT(SPSR0, SPI2X);//2 x faster spi
 	 
-     //SPSR0 = (SPSR0 & ~0x01  ) | ((0x04  >> 2) & 0x01  );
+     SET_BIT_AT(SPCR0, MSTR);
+	 SET_BIT_AT(SPCR0, SPE);
 	 
-     SPCR0 |= _BV(MSTR);
-     SPCR0 |= _BV(SPE);
-     
      SET_BIT_AT(PORTB,DDB2);//ss
      SET_BIT_AT(DDRB,DDB3);
      SET_BIT_AT(DDRB,DDB5); 
