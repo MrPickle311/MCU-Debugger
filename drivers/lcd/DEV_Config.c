@@ -31,91 +31,59 @@
 ******************************************************************************/
 #include "DEV_Config.h"
 
-void __write(volatile uint8_t* reg,uint8_t pin,uint8_t state)
-{
-	CLEAR_BIT_AT(*reg,pin);
-	if(state != 0)
-		SET_BIT_AT(*reg,pin);
-}
-
-void LCD_digitalWrite(uint8_t pin_nr,uint8_t state)
-{
-	switch(pin_nr)
-	{
-		case 7:
-			__write(&PORTD,7,state);
-			break;
-		case 8:
-			__write(&PORTB,0,state);
-			break;
-		case 9:
-			__write(&PORTB,1,state);
-			break;
-		case 10:
-			__write(&PORTB,2,state);
-			break;
-		default:
-			break;
-	}
-}
-
-uint8_t __read(volatile uint8_t* reg,uint8_t pin)
-{
-	return IS_BIT_SET_AT(*reg,pin);
-}
-
-uint8_t LCD_digitalRead(uint8_t pin_nr)
-{
-	switch(pin_nr)
-	{
-		case 7:
-			return PIND & _BV(DDD7);
-		case 8:
-			return PINB & _BV(DDB0);
-		case 9:
-			return PINB & _BV(DDB1);
-		case 10:
-			return PINB & _BV(DDB2);
-		default:
-			return 0;
-	}
-}
-
 void initTimer1()//pwm mode
 {
+	TIMER_16BitSetup setup = TIMER_16bit_DefaultSettings;
+	setup.mode_ = TIMER_16Bit_8BitFastPWM_Top;
+	setup.pins_under_control_ = TIMER_OnlyPinA;
+	setup.pin_A_mode_ = TIMER_CompareMatchClearPin;
+	setup.prescaler_ = TIMER_Synchronous_NoPrescaling;
+	TIMER_1_Init(setup,false);
+	DEV_Set_PWM(140);
+	/*
 	SET_BIT_AT(TCCR1A, COM1A1);
 	SET_BIT_AT(TCCR1A, WGM10);
 	SET_BIT_AT(TCCR1B, WGM12);
 	SET_BIT_AT(TCCR1B, CS10);
-}
-
-uint8_t transfer(uint8_t data)
-{
-	SPDR0 = data;
-	asm volatile("nop");//wait a clock tact
-	while (!(SPSR0 & _BV(SPIF))) ; // wait
-	return SPDR0;
-}
-
-void LCD_analogWrite(uint8_t value)
-{
-	OCR1A = value;
+	*/
 }
 
 void GPIO_Init()
 {
+	/*
 	SET_BIT_AT(DDRB,DDB0);
 	SET_BIT_AT(DDRB,DDB1);
 	SET_BIT_AT(DDRB,DDB2);
+	SET_BIT_AT(DDRB,DDB3);
+	SET_BIT_AT(DDRB,DDB5);
+	
+	SET_BIT_AT(PORTB,DDB2);//ss
 	SET_BIT_AT(DDRD,DDD7);
-	initTimer1();
-	LCD_analogWrite(140);
+	*/
+	PORT_setPinsAsOutput(PORT_CONFIG(B),0,1,2,3,5);
+	PORT_setPinAsOutput(PORT_CONFIG(D),7);
+	PORT_setPinHigh(PORT_STATE(B),2);
+}
+
+void spi_init()
+{
+	SPI_Setup setup = SPI_DefaultSetup;
+	setup.clock_polarization_ = SPI_HighState_AtIdleState;
+	setup.sampled_edge_ = SPI_FallingEdge;
+	setup.sampled_edge_ = SPI_LSB_AtFirst;
+	setup.sck_prescaler_ = SPI_SCK_2;
+	setup.startup_enable_ = true;
+	
+	SPI0_Init(setup);
 }
 
 void Config_Init()
 {
-     GPIO_Init();
-     
+	GPIO_Init();
+	initTimer1();
+    spi_init();
+	 
+	 /*
 	 SET_BIT_AT(SPCR0, CPOL);
 	 SET_BIT_AT(SPCR0, CPHA);
      
@@ -125,8 +93,6 @@ void Config_Init()
 	 
      SET_BIT_AT(SPCR0, MSTR);
 	 SET_BIT_AT(SPCR0, SPE);
-	 
-     SET_BIT_AT(PORTB,DDB2);//ss
-     SET_BIT_AT(DDRB,DDB3);
-     SET_BIT_AT(DDRB,DDB5); 
+	 */
+     
 }

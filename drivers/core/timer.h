@@ -79,7 +79,7 @@ enum TIMER_PinMode
 
 enum TIMER_PinsUnderControl
 {
-	TIMER_OnlyPinA = 0b11000000,
+	TIMER_OnlyPinA = 0b11000000,//TODO: RENAME
 	TIMER_OnlyPinB = 0b00110000,
 	TIMER_BothPins = 0b11110000
 };
@@ -87,7 +87,7 @@ enum TIMER_PinsUnderControl
 enum TIMER_SynchronousPrescaler
 {
 	TIMER_Synchronous_Disabled						   = 0b000,
-	TIMER_Synchronous_NoPrescaling					   = 0b100,
+	TIMER_Synchronous_NoPrescaling					   = 0b001,
 	TIMER_Synchronous_Prescaler8					   = 0b010,
 	TIMER_Synchronous_Prescaler64					   = 0b011,
 	TIMER_Synchronous_Prescaler256					   = 0b100,

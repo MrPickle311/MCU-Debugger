@@ -20,6 +20,18 @@
 
 #endif
 
+volatile SPI_Setup SPI_DefaultSetup = {
+					
+		SPI_Master,
+		false,
+		true,
+		false,
+		SPI_RisingEdge,
+		SPI_SCK_4,
+		SPI_LowState_AtIdleState,
+		SPI_MSB_AtFirst
+};
+
 #define MSTR_pos 4
 
 static inline void _setupMode(register_t* spi_control_register, enum SPI_Mode mode)
@@ -91,19 +103,19 @@ static inline void _setupSampledEdge(register_t* spi_control_register, enum SPI_
 #define SPR1_pos  1
 #define SPI2X_pos 0
 
-static inline void _setupSCKFraquency(register_t* spi_control_register,
+static inline void _setupSCKPrescaler(register_t* spi_control_register,
 									  register_t* spi_status_register,
-									  enum SPI_SCK_Fraquency fraquency)
+									  enum SPI_SCK_Prescaler prescaler)
 {
 	clearBitsAt(spi_control_register , SPR1_pos,SPR0_pos );
 	CLEAR_BIT_AT(*spi_status_register , SPI2X_pos);
-	SET_SHIFTED_BIT_MASK(*spi_control_register, EXTRACT_BIT_MASK_FROM(fraquency, SPR0_pos, SPR1_pos), NOTHING);
-	SET_SHIFTED_BIT_MASK(*spi_control_register, EXTRACT_BIT_MASK_FROM(fraquency, SPI2X_pos, SPI2X_pos), NOTHING);
+	SET_SHIFTED_BIT_MASK(*spi_control_register, EXTRACT_BIT_MASK_FROM(prescaler, SPR0_pos, SPR1_pos), NOTHING);
+	SET_SHIFTED_BIT_MASK(*spi_control_register, EXTRACT_BIT_MASK_FROM(prescaler, SPI2X_pos, SPI2X_pos), NOTHING);
 }
 
-#define  setupSCKFraquency(spi_nmbr , sck_fraquency)		_setupSCKFraquency(&SPCR##spi_nmbr ,\
-																		       &SPSR##spi_nmbr ,\
-																		       sck_fraquency )
+#define  setupSCKPrescaler(spi_nmbr , sck_prescaler)	_setupSCKPrescaler(&SPCR##spi_nmbr ,\
+																		   &SPSR##spi_nmbr ,\
+																		   sck_prescaler )
 
 static inline void _spi0_Master_setupPins()
 {
@@ -170,7 +182,7 @@ void SPI0_Init(SPI_Setup setup)
 	
 	setupTransmitionMode(0 , setup._transmition_mode_);
 	
-	setupSCKFraquency(0, setup.sck_fraquency_);
+	setupSCKPrescaler(0, setup.sck_prescaler_);
 	
 	
 	SPI0_clearTransmitionCompleted_Flag();
@@ -204,7 +216,7 @@ void SPI1_Init(SPI_Setup setup)
 	
 	setupTransmitionMode(1 , setup._transmition_mode_);
 	
-	setupSCKFraquency(1, setup.sck_fraquency_);
+	setupSCKPrescaler(1, setup.sck_prescaler_);
 	
 	
 	SPI1_clearTransmitionCompleted_Flag();
@@ -220,8 +232,6 @@ byte_t SPI0_exchangeByte(byte_t byte)
 	SPI0_waitForTransmitionCompleted();
 	return SPI0_receiveByte();
 }
-
-
 
 #ifdef _AVR_ATMEGA328PB_H_INCLUDED
 
@@ -247,7 +257,6 @@ ISR(SPI0_STC_vect)
 
 ISR(PCINT0_vect)
 {
-	//DAJ OBS£UGÊ ŒLEDZENIA STANU TEGO PINU PB2
 	if(SPI0_StartTransmitionHandler != NULL)
 		SPI0_StartTransmitionHandler();
 }
@@ -264,9 +273,8 @@ ISR(SPI1_STC_vect)
 
 ISR(PCINT3_vect)
 {
-	//DAJ OBS£UGÊ ŒLEDZENIA STANU TEGO PINU PB2
-	//if(SPI1_StartTransmitionHandler != NULL)
-	//	SPI1_StartTransmitionHandler();
+	if(SPI1_StartTransmitionHandler != NULL)
+		SPI1_StartTransmitionHandler();
 }
 
 #endif

@@ -35,9 +35,11 @@ function:
 static void LCD_Reset(void)
 {
 	DEV_Delay_ms(200);
-	DEV_Digital_Write(DEV_RST_PIN, 0);
+	//DEV_Digital_Write(DEV_RST_PIN, 0);
+	DEV_RST_PIN_SET_LOW();
 	DEV_Delay_ms(200);
-	DEV_Digital_Write(DEV_RST_PIN, 1);
+	//DEV_Digital_Write(DEV_RST_PIN, 1);
+	DEV_RST_PIN_SET_HIGH();
 	DEV_Delay_ms(200);
 }
 
@@ -45,28 +47,37 @@ static void LCD_Reset(void)
 function:
 		Write data and commands
 *******************************************************************************/
+
 static void LCD_Write_Command(UBYTE data)	 
 {	
-	DEV_Digital_Write(DEV_CS_PIN, 0);
-	DEV_Digital_Write(DEV_DC_PIN, 0);
+	//DEV_Digital_Write(DEV_CS_PIN, 0);
+	//DEV_Digital_Write(DEV_DC_PIN, 0);
+	DEV_CS_PIN_SET_LOW();
+	DEV_DC_PIN_SET_LOW();
 	DEV_SPI_WRITE(data);
 }
 
 static void LCD_WriteData_Byte(UBYTE data) 
 {	
-	DEV_Digital_Write(DEV_CS_PIN, 0);
-	DEV_Digital_Write(DEV_DC_PIN, 1);
-	DEV_SPI_WRITE(data);  
-	DEV_Digital_Write(DEV_CS_PIN,1);
+	//DEV_Digital_Write(DEV_CS_PIN, 0);
+	//DEV_Digital_Write(DEV_DC_PIN, 1);
+	DEV_CS_PIN_SET_LOW();
+	DEV_DC_PIN_SET_HIGH();
+	DEV_SPI_WRITE(data);
+	DEV_CS_PIN_SET_HIGH();  
+	//DEV_Digital_Write(DEV_CS_PIN,1);
 }  
 
 void LCD_WriteData_Word(UWORD data)
 {
-	DEV_Digital_Write(DEV_CS_PIN, 0);
-	DEV_Digital_Write(DEV_DC_PIN, 1);
+	//DEV_Digital_Write(DEV_CS_PIN, 0);
+	//DEV_Digital_Write(DEV_DC_PIN, 1);
+	DEV_CS_PIN_SET_LOW();
+	DEV_DC_PIN_SET_HIGH();
 	DEV_SPI_WRITE((data>>8) & 0xff);
 	DEV_SPI_WRITE(data);
-	DEV_Digital_Write(DEV_CS_PIN, 1);
+	//DEV_Digital_Write(DEV_CS_PIN, 1);
+	DEV_CS_PIN_SET_HIGH();
 }	  
 
 
@@ -224,7 +235,8 @@ void LCD_Clear(UWORD Color)
 {
 	unsigned int i,j;  	
 	LCD_SetWindow(0, 0, LCD_WIDTH, LCD_HEIGHT);
-	DEV_Digital_Write(DEV_DC_PIN, 1);
+	//DEV_Digital_Write(DEV_DC_PIN, 1);
+	DEV_DC_PIN_SET_HIGH();
 	for(i = 0; i < LCD_WIDTH; i++){
 		for(j = 0; j < LCD_HEIGHT; j++){
 			DEV_SPI_WRITE((Color>>8)&0xff);

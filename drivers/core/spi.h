@@ -86,7 +86,7 @@ enum SPI_ClockPolarization
 	SPI_HighState_AtIdleState = 0b1
 };
 
-enum SPI_SCK_Fraquency
+enum SPI_SCK_Prescaler
 {
 	SPI_SCK_2   = 0b100,
 	SPI_SCK_4   = 0b000,
@@ -112,7 +112,7 @@ struct SPI_Setup
 	bool use_startup_interrupt_;
 	
 	enum SPI_SCK_SampledEdge   sampled_edge_;
-	enum SPI_SCK_Fraquency	   sck_fraquency_;
+	enum SPI_SCK_Prescaler	   sck_prescaler_;
 	enum SPI_ClockPolarization clock_polarization_;
 	enum SPI_TransmitionMode   _transmition_mode_;
 };

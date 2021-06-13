@@ -39,6 +39,9 @@
 #include <avr/builtins.h>
 #include <util/delay.h>
 #include "../core/bit_utils.h"
+#include "../core/spi.h"
+#include "../core/timer.h"
+#include "../core/port.h"
 
 #define UBYTE   uint8_t
 #define UWORD   uint16_t
@@ -49,36 +52,32 @@
 **/
 //DIN MOSI PB3 11
 //CLK SCK PB5 13
+//ARDUINO MAPPING
 #define DEV_CS_PIN  10	//PB2
 #define DEV_DC_PIN  7	//PD7
 #define DEV_RST_PIN 8	//PB0
 #define DEV_BL_PIN  9	//PB1
 
-void __write(volatile uint8_t* reg,uint8_t pin,uint8_t state);
-
-void LCD_digitalWrite(uint8_t pin_nr,uint8_t state);
-
-uint8_t __read(volatile uint8_t* reg,uint8_t pin);
-
-uint8_t LCD_digitalRead(uint8_t pin_nr);
-
-void initTimer1();
-
-uint8_t transfer(uint8_t data);
-
-void LCD_analogWrite(uint8_t value);
 
 /**
  * GPIO read and write
 **/
-#define DEV_Digital_Write(_pin, _value) LCD_digitalWrite(_pin, _value == 0? 0:1)
-#define DEV_Digital_Read(_pin) LCD_digitalRead(_pin)
+#define DEV_CS_PIN_SET_LOW()	    CLEAR_BIT_AT(PORTB,2)
+#define DEV_DC_PIN_SET_LOW()	    CLEAR_BIT_AT(PORTD,7)
+#define DEV_RST_PIN_SET_LOW()	    CLEAR_BIT_AT(PORTB,0)
+#define DEV_BL_PIN_SET_LOW()	    CLEAR_BIT_AT(PORTB,1)
 
+#define DEV_CS_PIN_SET_HIGH()	    SET_BIT_AT(PORTB,2)
+#define DEV_DC_PIN_SET_HIGH() 		SET_BIT_AT(PORTD,7)
+#define DEV_RST_PIN_SET_HIGH()		SET_BIT_AT(PORTB,0)
+#define DEV_BL_PIN_SET_HIGH() 		SET_BIT_AT(PORTB,1)
+
+void initTimer1();
 
 /**
  * SPI
 **/
-#define DEV_SPI_WRITE(_dat)    transfer(_dat)
+#define DEV_SPI_WRITE(_dat)    SPI0_exchangeByte(_dat)
 
 /**
  * delay x ms
@@ -88,7 +87,7 @@ void LCD_analogWrite(uint8_t value);
 /**
  * PWM_BL
 **/
- #define  DEV_Set_PWM(_Value)  LCD_analogWrite(_Value)
+ #define  DEV_Set_PWM(_Value)  TIMER_setOutputCompareA_Value(1,_Value);
 
 /*-----------------------------------------------------------------------------*/
  void Config_Init();
