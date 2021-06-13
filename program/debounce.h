@@ -41,6 +41,17 @@ void debounce_init(void);
 // Check button state and set bits in the button_down variable if a
 // debounced button down press is detected.
 // Call this function every 10 ms or so.
+
+/*
+
+Bit number   | 7 6 5 4 3 2 1 0
+--------------------------
+vcount_high  | 0 0 1 1 0 1 0 1
+vcount_low   | 1 1 0 0 1 1 0 1
+Value        | 1 1 2 2 1 3 0 3
+*/
+
+
 static inline void debounce(void)
 {
 	// Eight vertical two bit counters for number of equal states
@@ -51,7 +62,7 @@ static inline void debounce(void)
 	
 	// Read buttons (active low so invert with ~). Xor with
 	// button_state to see which ones are about to change state
-	uint8_t state_changed = ~BUTTON_PIN ^ button_state;
+	uint8_t state_changed = ~BUTTON_PIN ^ button_state;//contain zero for the bits that don’t have changed
 	
 	// Decrease counters where state_changed = 1, set the others to 0b11.
 	VC_DEC_OR_SET(vcount_high, vcount_low, state_changed);

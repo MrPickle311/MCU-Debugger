@@ -85,7 +85,7 @@ int main(void)
 	configureDebouncingTimer();
 	debounce_init();
 	
-	//wipeFRAM();
+	//wipeFRAM(); this function slow debugger ,so i tunred it off
 	_delay_ms(300);
 	
 	sei();

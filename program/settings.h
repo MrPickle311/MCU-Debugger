@@ -33,6 +33,8 @@ volatile uint16_t* current_fram_push_positions;
 
 void resetLoadBreakpoint();
 
+void resetSaveBreakpoint();
+
 void goToNextSaveBreakpoint();
 
 void goToNextLoadBreakpoint();

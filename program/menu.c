@@ -13,6 +13,7 @@ volatile uint8_t start_flag = 0;
 void MENU_updateBreakpointNumber()
 {
 	Paint_DrawNum(16*10,0,current_breakpoint_to_load,&Font16,BLUE,WHITE);
+	//Paint_DrawNum(16*10,0,current_fram_push_positions[current_breakpoint_to_load],&Font16,BLUE,WHITE);
 }
 
 void MENU_Browser_printHeaderBody()
@@ -169,11 +170,12 @@ void MENU_loadNextBreakpoint()
 {
 	DISABLE_BUTTONS();
 	MENU_printUpdatingDataMessage();
+	resetSaveBreakpoint();
 	COM_sendDebugSignal();
 	COM_commandProcessor();//data are injected to fram now 
 	
 	goToNextSaveBreakpoint();//so i can switch this buffer
-	UPDATE_SAVE_POS();
+	
 	MENU_printChoiceMenu();
 	ENABLE_BUTTONS();
 }
