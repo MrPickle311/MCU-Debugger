@@ -211,7 +211,7 @@ void Paint_DrawPoint( UWORD Xpoint,       UWORD Ypoint, UWORD Color,
                       DOT_PIXEL Dot_Pixel,DOT_STYLE Dot_FillWay)
 {
     if (Xpoint > Paint.Width || Ypoint > Paint.Height) {
-        Debug("Paint_DrawPoint Input exceeds the normal display range\r\n");
+        //Debug("Paint_DrawPoint Input exceeds the normal display range\r\n");
         return;
     }
 
@@ -248,7 +248,7 @@ void Paint_DrawLine(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend,
 {
     if (Xstart > Paint.Width || Ystart > Paint.Height ||
         Xend > Paint.Width || Yend > Paint.Height) {
-        Debug("Paint_DrawLine Input exceeds the normal display range\r\n");
+        //Debug("Paint_DrawLine Input exceeds the normal display range\r\n");
         return;
     }
 
@@ -305,7 +305,7 @@ void Paint_DrawRectangle( UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend,
 {
     if (Xstart > Paint.Width || Ystart > Paint.Height ||
         Xend > Paint.Width || Yend > Paint.Height) {
-        Debug("Input exceeds the normal display range\r\n");
+        //Debug("Input exceeds the normal display range\r\n");
         return;
     }
 
@@ -336,7 +336,7 @@ void Paint_DrawCircle(  UWORD X_Center, UWORD Y_Center, UWORD Radius,
                         UWORD Color, DOT_PIXEL Line_width, DRAW_FILL Draw_Fill )
 {
     if (X_Center > Paint.Width || Y_Center >= Paint.Height) {
-        Debug("Paint_DrawCircle Input exceeds the normal display range\r\n");
+        //Debug("Paint_DrawCircle Input exceeds the normal display range\r\n");
         return;
     }
 

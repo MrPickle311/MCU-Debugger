@@ -43,16 +43,16 @@
  * Image attributes
 **/
 typedef struct {
-    UBYTE *Image;
-    UWORD Width;
-    UWORD Height;
-    UWORD WidthMemory;
-    UWORD HeightMemory;
-    UWORD Color;
-    UWORD Rotate;
-    UWORD Mirror;
-    UWORD WidthByte;
-    UWORD HeightByte;
+	UBYTE *Image;
+	UWORD Width;
+	UWORD Height;
+	UWORD WidthMemory;
+	UWORD HeightMemory;
+	UWORD Color;
+	UWORD Rotate;
+	UWORD Mirror;
+	UWORD WidthByte;
+	UWORD HeightByte;
 } PAINT;
 extern volatile PAINT Paint;
 

@@ -35,9 +35,9 @@
 #define LCD_WIDTH   240 //LCD width
 #define LCD_HEIGHT  320 //LCD height
  
-void LCD_WriteData_Word(UWORD da);
+//void LCD_WriteData_Word(UWORD da);
 
-void LCD_SetCursor(UWORD X, UWORD Y);
+//void LCD_SetCursor(UWORD X, UWORD Y);
 void LCD_SetWindow(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD  Yend);
 void LCD_DrawPaint(UWORD x, UWORD y, UWORD Color);
 
@@ -46,5 +46,38 @@ void LCD_SetBackLight(UWORD Value);
 
 void LCD_Clear(UWORD Color);
 void LCD_ClearWindow(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend,UWORD color);
+
+#define LCD_Write_Command(data)\
+		DEV_CS_PIN_SET_LOW();\
+		DEV_DC_PIN_SET_LOW();\
+		DEV_SPI_WRITE(data)
+
+#define LCD_WriteData_Byte(data)\
+		DEV_CS_PIN_SET_LOW();\
+		DEV_DC_PIN_SET_HIGH();\
+		DEV_SPI_WRITE(data);\
+		DEV_CS_PIN_SET_HIGH()
+
+#define LCD_WriteData_Word(data)\
+		DEV_CS_PIN_SET_LOW();\
+		DEV_DC_PIN_SET_HIGH();\
+		DEV_SPI_WRITE((data>>8) & 0xff);\
+		DEV_SPI_WRITE(data);\
+		DEV_CS_PIN_SET_HIGH()
+
+#define LCD_SetCursor(X,Y)\
+		LCD_Write_Command(0x2a);\
+		LCD_WriteData_Byte(X >> 8);\
+		LCD_WriteData_Byte(X);\
+		LCD_WriteData_Byte(X >> 8);\
+		LCD_WriteData_Byte(X);\
+		\
+		LCD_Write_Command(0x2b);\
+		LCD_WriteData_Byte(Y >> 8);\
+		LCD_WriteData_Byte(Y);\
+		LCD_WriteData_Byte(Y >> 8);\
+		LCD_WriteData_Byte(Y);\
+		\
+		LCD_Write_Command(0x2C)
 
 #endif

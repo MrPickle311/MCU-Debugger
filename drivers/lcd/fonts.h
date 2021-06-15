@@ -45,6 +45,12 @@
 #define MAX_WIDTH_FONT          32
 #define OFFSET_BITMAP           
 
+#define FONT_16_WIDTH  11
+#define FONT_16_HEIGHT 16
+
+#define MAX_CHAR16_IN_ROW_COUNT    21
+#define MAX_CHAR16_IN_COLUMN_COUNT 20
+
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -62,19 +68,7 @@ typedef struct _tFont
 } sFONT;
 
 
-//GB2312
-typedef struct                                          // 汉字字模数据结构
-{
-  unsigned char index[3];                               // 汉字内码索引
-  const char matrix[MAX_HEIGHT_FONT*MAX_WIDTH_FONT/8];  // 点阵码数据
-}CH_CN;
-
-
-extern sFONT Font24;
-extern sFONT Font20;
 extern sFONT Font16;
-extern sFONT Font12;
-extern sFONT Font8;
 
 extern const unsigned char Font16_Table[];
 

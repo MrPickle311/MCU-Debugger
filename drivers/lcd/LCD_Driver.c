@@ -48,6 +48,7 @@ function:
 		Write data and commands
 *******************************************************************************/
 
+/*
 static void LCD_Write_Command(UBYTE data)	 
 {	
 	//DEV_Digital_Write(DEV_CS_PIN, 0);
@@ -55,8 +56,9 @@ static void LCD_Write_Command(UBYTE data)
 	DEV_CS_PIN_SET_LOW();
 	DEV_DC_PIN_SET_LOW();
 	DEV_SPI_WRITE(data);
-}
+}*/
 
+/*
 static void LCD_WriteData_Byte(UBYTE data) 
 {	
 	//DEV_Digital_Write(DEV_CS_PIN, 0);
@@ -67,7 +69,9 @@ static void LCD_WriteData_Byte(UBYTE data)
 	DEV_CS_PIN_SET_HIGH();  
 	//DEV_Digital_Write(DEV_CS_PIN,1);
 }  
+*/
 
+/*
 void LCD_WriteData_Word(UWORD data)
 {
 	//DEV_Digital_Write(DEV_CS_PIN, 0);
@@ -79,6 +83,7 @@ void LCD_WriteData_Word(UWORD data)
 	//DEV_Digital_Write(DEV_CS_PIN, 1);
 	DEV_CS_PIN_SET_HIGH();
 }	  
+*/
 
 
 /******************************************************************************
@@ -209,6 +214,8 @@ parameter	:
 	  Ystart:	Start UWORD y coordinate
 
 ******************************************************************************/
+
+/*
 void LCD_SetCursor(UWORD X, UWORD Y)
 { 
 	LCD_Write_Command(0x2a);
@@ -225,7 +232,7 @@ void LCD_SetCursor(UWORD X, UWORD Y)
 
 	LCD_Write_Command(0x2C);
 }
-
+*/
 /******************************************************************************
 function:	Clear screen function, refresh the screen to a certain color
 parameter	:

@@ -16,6 +16,42 @@
 
 volatile uint8_t start_flag;
 
+volatile struct MENU_Option
+{
+	char* str_;
+	uint8_t str_length_;
+	void (*option_service_)(void);
+};
+
+typedef struct MENU_Option MENU_Option;
+
+volatile struct MENU_Point
+{
+	uint8_t x_;
+	uint8_t y_;
+};
+
+typedef struct MENU_Point MENU_Point;
+
+volatile struct MENU_Menu
+{
+	MENU_Option* options_;
+	uint8_t options_count_;
+	MENU_Point begin_;
+	MENU_Point end_;
+};
+
+typedef struct MENU_Menu MENU_Menu;
+
+void MENU_printString_NotSelected(const char* const str, MENU_Point* start_point);
+
+void MENU_printString_Selected(const char* const str, MENU_Point* start_point);
+
+void MENU_drawRectangle(UWORD x_start, UWORD y_start, UWORD x_end, UWORD y_end);
+
+void MENU_printMenu(const MENU_Menu * const menu);
+
+void MENU_updateMenu(const MENU_Menu * const menu);
 
 void MENU_printSorroundingLines();
 

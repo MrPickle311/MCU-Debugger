@@ -13,7 +13,6 @@ volatile uint8_t start_flag = 0;
 void MENU_updateBreakpointNumber()
 {
 	Paint_DrawNum(16*10,0,current_breakpoint_to_load,&Font16,BLUE,WHITE);
-	//Paint_DrawNum(16*10,0,current_fram_push_positions[current_breakpoint_to_load],&Font16,BLUE,WHITE);
 }
 
 void MENU_Browser_printHeaderBody()
@@ -228,6 +227,66 @@ void MENU_printChoiceMenu()
 	
 	Paint_DrawString_EN(0,16*15,"Breakpoints: ",&Font16,BLACK,WHITE);
 	Paint_DrawNum(16*10,16*15,breakpoints_total_nmbr,&Font16,BLACK,WHITE);
+}
+
+void MENU_printString_NotSelected(const char* const str, MENU_Point* start_point )
+{
+	Paint_DrawString_EN(FONT_16_WIDTH * start_point->x_ ,
+						FONT_16_HEIGHT * start_point->y_ ,
+						str ,
+						&Font16 ,
+						BLACK ,
+						WHITE );
+}
+
+void MENU_printString_Selected(const char* const str, MENU_Point* start_point )
+{
+	Paint_DrawString_EN(FONT_16_WIDTH * start_point->x_ ,
+						FONT_16_HEIGHT * start_point->y_ ,
+						str ,
+						&Font16 ,
+						RED ,
+						WHITE );
+}
+
+void MENU_drawRectangle(UWORD x_start, UWORD y_start, UWORD x_end, UWORD y_end)
+{
+	Paint_DrawRectangle(x_start, y_start, x_end , y_end, WHITE, 2, DRAW_FILL_EMPTY);
+}
+
+#define PLACE_FOR_SCROLLBAR 6
+
+static void __update_Scrollbar()
+{
+	
+}
+
+static void __update_Text()
+{
+	
+}
+
+void MENU_printMenu(const MENU_Menu * const menu)
+{
+	static uint16_t frame_x_start = 0;
+	static uint16_t frame_y_start = 0;
+	static uint16_t frame_x_end   = 0;
+	static uint16_t frame_y_end   = 0;
+	
+	frame_x_start = menu->begin_.x_ * FONT_16_WIDTH  + (uint8_t)(FONT_16_WIDTH  / 2) + PLACE_FOR_SCROLLBAR;
+	frame_y_start = menu->begin_.y_ * FONT_16_HEIGHT + FONT_16_HEIGHT / 2;
+	frame_x_end   = menu->end_.x_   * FONT_16_WIDTH  + (uint8_t)(FONT_16_WIDTH  / 2) + PLACE_FOR_SCROLLBAR;
+	frame_y_end   = menu->end_.y_   * FONT_16_HEIGHT + FONT_16_HEIGHT / 2;
+	
+	//Paint_DrawNum(11*5,16*5,frame_y_end,&Font16,BLACK,WHITE);
+	
+	MENU_drawRectangle(frame_x_start, frame_y_start, frame_x_end, frame_y_end);
+	MENU_
+}
+
+void MENU_updateMenu(const MENU_Menu * const menu)
+{
+	
 }
 
 void MENU_printStartMenu()

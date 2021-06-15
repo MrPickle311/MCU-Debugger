@@ -49,7 +49,7 @@ void configureLCD()
 	 LCD_Clear(0xffff);
 	 Paint_NewImage(LCD_WIDTH, LCD_HEIGHT, 0, BLACK);
 	 Paint_Clear(BLACK);
-	 Paint_DrawString_EN(20,180, "Welcome to Debugger",  &Font16, BLACK, WHITE);
+	 //Paint_DrawString_EN(20,180, "Welcome to Debugger",  &Font16, BLACK, WHITE);
 }
 
 void configurePORTS()
@@ -78,24 +78,45 @@ int main(void)
 {
 	configurePORTS();
 	
-	configureTWISlave();
-	configureTWIMaster();
+	//configureTWISlave();
+	//configureTWIMaster();
 	configureLCD();
-	configurePORTS();
-	configureDebouncingTimer();
-	debounce_init();
+	//configureDebouncingTimer();
+	//debounce_init();
 	
 	//wipeFRAM(); this function slow debugger ,so i tunred it off
-	_delay_ms(300);
+	//_delay_ms(300);
 	
-	sei();
+	MENU_Menu menu1;
+	menu1.begin_.x_ = 0;
+	menu1.begin_.y_ = 0;
+	menu1.end_.x_ = 10;
+	menu1.end_.y_ = 10;
+	
+	MENU_Menu menu2;
+	menu2.begin_.x_ = 11;
+	menu2.begin_.y_ = 0;
+	menu2.end_.x_ = 20;
+	menu2.end_.y_ = 10;
+	
+	MENU_Menu menu3;
+	menu3.begin_.x_ = 0;
+	menu3.begin_.y_ = 11;
+	menu3.end_.x_ = 20;
+	menu3.end_.y_ = 19;
+	
+	MENU_printMenu(&menu1);
+	MENU_printMenu(&menu2);
+	MENU_printMenu(&menu3);
+	
+	//sei();
 	//fram_test1();
 	//fram_test2();
 	//fram_test3();
 	//fram_test4();
     while (1)
 	{
-		MENU_navigate();
+		//MENU_navigate();
 	}
 }
 
