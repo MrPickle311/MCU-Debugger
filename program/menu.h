@@ -18,12 +18,14 @@ volatile uint8_t start_flag;
 
 volatile struct MENU_Option
 {
-	char* str_;
-	uint8_t str_length_;
+	const char __memx* str_lines_;
+	uint8_t lines_nmbr;
 	void (*option_service_)(void);
 };
 
 typedef struct MENU_Option MENU_Option;
+
+extern MENU_Option menuS;
 
 volatile struct MENU_Point
 {
@@ -33,19 +35,48 @@ volatile struct MENU_Point
 
 typedef struct MENU_Point MENU_Point;
 
+volatile struct MENU_TextRange
+{
+	uint8_t x_start_;
+	uint8_t x_end_;
+};
+
+typedef struct MENU_TextRange MENU_TextRange;
+
+#define TEXT_RANGE_DIFF(range)	( range.x_end_ - range.x_start_ )
+
 volatile struct MENU_Menu
 {
 	MENU_Option* options_;
 	uint8_t options_count_;
+	uint8_t lines_count_;
 	MENU_Point begin_;
 	MENU_Point end_;
 };
 
 typedef struct MENU_Menu MENU_Menu;
 
-void MENU_printString_NotSelected(const char* const str, MENU_Point* start_point);
+#define MENU_TOP_Y_CELL_POS(menu)		  ( menu.begin_.y_ + 1 )
+#define MENU_BOTTOM_Y_CELL_POS(menu)	  ( menu.end_.y_   - 1 )
+#define MENU_LEFT_X_LEFT_CELL_POS(menu)   ( menu.begin_.x_ + 1 )
+#define MENU_LEFT_X_RIGHT_CELL_POS(menu)  ( menu.end_.x_   - 1 )
+#define MENU_LINES_NMBR(menu)			  ( menu.end_.y_ - menu.start_.y_ - 1 )
+#define MENU_IN_LINE_CHARS_NMBR(menu)	  ( menu.end_.x_ - menu.start_.x_ - 1 )
 
-void MENU_printString_Selected(const char* const str, MENU_Point* start_point);
+void MENU_printChar_NotSelected(const char chr,MENU_Point* start_point);
+
+void MENU_printChar_Selected(const char chr,MENU_Point* start_point);
+
+//this function will return a -1 value if it encounter a '\0'
+int8_t MENU_printTextLine_NotSelected(const char __memx*		    str         , 
+							          const MENU_TextRange* const   text_slice  ,
+							          uint8_t		  				x_start_pos ,
+							          uint8_t						y_pos);
+
+int8_t MENU_printTextLine_Selected(const char* const			 str         , 
+								   const MENU_TextRange* const   text_slice  ,
+								   uint8_t		  				 x_start_pos ,
+								   uint8_t						 y_pos);
 
 void MENU_drawRectangle(UWORD x_start, UWORD y_start, UWORD x_end, UWORD y_end);
 

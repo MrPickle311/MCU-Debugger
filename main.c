@@ -18,6 +18,7 @@
 #include "program/menu.h"
 #include "program/com.h"
 #include "tests/fram_buffer_test.h"
+#include <avr/pgmspace.h>
 
 volatile address_16bit_t fram_push_adr = {0x0};
 volatile address_16bit_t fram_pop_adr  = {0x0};
@@ -74,6 +75,10 @@ void wipeFRAM()
 		FRAM_writeSingleByte(0,i);
 }
 
+#define PGM_STR(X) ( (const __flash char[]){ X } )//initializing conversion
+
+const __flash char* const __flash table1[] = { PGM_STR("Line1\0") , PGM_STR("Line2\0") , PGM_STR("Line3\0") };
+
 int main(void)
 {
 	configurePORTS();
@@ -108,6 +113,31 @@ int main(void)
 	MENU_printMenu(&menu1);
 	MENU_printMenu(&menu2);
 	MENU_printMenu(&menu3);
+	
+	MENU_TextRange range;
+	range.x_start_ = 0;
+	range.x_end_   = 20;
+	
+	menuS.str_lines_ = table1[1];
+	
+	for(uint8_t i = 0 ; i < 7 ; ++i)
+		MENU_printTextLine_NotSelected(menuS.str_lines_ ,&range, 1, 12 + i);
+	
+	Paint_DrawLine(20 * FONT_16_WIDTH + 6 , 
+				   12 * FONT_16_HEIGHT , 
+				   20 * FONT_16_WIDTH + 6 , 
+				   19 * FONT_16_HEIGHT ,
+				   RED , 
+				   2 , 
+				   LINE_STYLE_SOLID);
+	
+	Paint_DrawLine(20 * FONT_16_WIDTH + 6 ,
+				   12 * FONT_16_HEIGHT ,
+				   20 * FONT_16_WIDTH + 6 ,
+				   14 * FONT_16_HEIGHT ,
+				   RED ,
+				   4 ,
+				   LINE_STYLE_SOLID);
 	
 	//sei();
 	//fram_test1();

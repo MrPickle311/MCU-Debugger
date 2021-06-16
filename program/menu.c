@@ -10,6 +10,8 @@
 
 volatile uint8_t start_flag = 0;
 
+MENU_Option menuS;
+
 void MENU_updateBreakpointNumber()
 {
 	Paint_DrawNum(16*10,0,current_breakpoint_to_load,&Font16,BLUE,WHITE);
@@ -229,24 +231,86 @@ void MENU_printChoiceMenu()
 	Paint_DrawNum(16*10,16*15,breakpoints_total_nmbr,&Font16,BLACK,WHITE);
 }
 
-void MENU_printString_NotSelected(const char* const str, MENU_Point* start_point )
+void MENU_printChar_NotSelected(const char chr,MENU_Point* start_point)
 {
-	Paint_DrawString_EN(FONT_16_WIDTH * start_point->x_ ,
-						FONT_16_HEIGHT * start_point->y_ ,
-						str ,
-						&Font16 ,
-						BLACK ,
-						WHITE );
+	Paint_DrawChar( start_point->x_ * FONT_16_WIDTH  ,
+				    start_point->y_ * FONT_16_HEIGHT ,
+				    chr								 ,
+				    &Font16							 ,
+				    BLACK							 ,
+				    WHITE);
 }
 
-void MENU_printString_Selected(const char* const str, MENU_Point* start_point )
+void MENU_printChar_Selected(const char chr, MENU_Point* start_point)
 {
-	Paint_DrawString_EN(FONT_16_WIDTH * start_point->x_ ,
-						FONT_16_HEIGHT * start_point->y_ ,
-						str ,
-						&Font16 ,
-						RED ,
-						WHITE );
+	Paint_DrawChar( start_point->x_ * FONT_16_WIDTH  ,
+				    start_point->y_ * FONT_16_HEIGHT ,
+				    chr								 ,
+				    &Font16							 ,
+				    RED								 ,
+				    WHITE);        
+}
+
+int8_t MENU_printTextLine_NotSelected(const char __memx*		    str         , 
+							          const MENU_TextRange* const   text_slice  ,
+							          uint8_t		  			    x_start_pos ,
+							          uint8_t					    y_pos)
+{
+	static const char __memx*       text_ptr     = NULL;
+	static MENU_Point			    char_point   = {0,0}; 
+	static uint8_t				    in_slice_pos = 0; 
+	static uint8_t				    char_count   = 0; 
+	
+	text_ptr      = &str[text_slice->x_start_];
+	char_point.x_ = x_start_pos;
+	char_point.y_ = y_pos;
+	in_slice_pos  = 0;
+	char_count    = text_slice->x_end_ - text_slice->x_start_ + 1;
+	
+	while( in_slice_pos <  char_count )
+	{
+		if( *text_ptr == '\0' )
+			return - 1;
+		
+		MENU_printChar_NotSelected( *text_ptr, &char_point ); 
+	
+		++char_point.x_;
+		++text_ptr;
+		++in_slice_pos;
+	}
+	
+	return text_slice->x_end_;
+}
+
+int8_t MENU_printTextLine_Selected(const char* const			  str         , 
+							       const MENU_TextRange* const    text_slice  ,
+							       uint8_t		  				  x_start_pos ,
+							       uint8_t						  y_pos)
+{
+	static const char __memx*       text_ptr     = NULL;
+	static MENU_Point			    char_point   = {0,0};
+	static uint8_t				    in_slice_pos = 0;
+	static uint8_t				    char_count   = 0;
+	
+	text_ptr      = &str[text_slice->x_start_];
+	char_point.x_ = x_start_pos;
+	char_point.y_ = y_pos;
+	in_slice_pos  = 0;
+	char_count    = text_slice->x_end_ - text_slice->x_start_ + 1;
+	
+	while( in_slice_pos <  char_count )
+	{
+		if( *text_ptr == '\0' )
+		return - 1;
+		
+		MENU_printChar_Selected( *text_ptr, &char_point );
+		
+		++char_point.x_;
+		++text_ptr;
+		++in_slice_pos;
+	}
+	
+	return text_slice->x_end_;
 }
 
 void MENU_drawRectangle(UWORD x_start, UWORD y_start, UWORD x_end, UWORD y_end)
@@ -254,34 +318,48 @@ void MENU_drawRectangle(UWORD x_start, UWORD y_start, UWORD x_end, UWORD y_end)
 	Paint_DrawRectangle(x_start, y_start, x_end , y_end, WHITE, 2, DRAW_FILL_EMPTY);
 }
 
-#define PLACE_FOR_SCROLLBAR 6
+#define PLACE_FOR_SCROLLBAR 8
 
-static void __update_Scrollbar()
+#define UP 0
+#define DOWN 1
+
+typedef uint8_t DIRECTION;
+
+static void __update_Scrollbar(const MENU_Menu * const menu, const DIRECTION direction)
 {
+	//menu->lines_count_ 
+}
+
+static void __update_Text(const MENU_Menu * const menu, const DIRECTION direction )
+{
+	static uint8_t start_x_cell = 0;
+	static uint8_t start_y_cell = 0;
+	
 	
 }
 
-static void __update_Text()
-{
-	
-}
-
-void MENU_printMenu(const MENU_Menu * const menu)
+static void __draw_Frame(const MENU_Menu * const menu)
 {
 	static uint16_t frame_x_start = 0;
 	static uint16_t frame_y_start = 0;
 	static uint16_t frame_x_end   = 0;
 	static uint16_t frame_y_end   = 0;
 	
-	frame_x_start = menu->begin_.x_ * FONT_16_WIDTH  + (uint8_t)(FONT_16_WIDTH  / 2) + PLACE_FOR_SCROLLBAR;
+	frame_x_start = menu->begin_.x_ * FONT_16_WIDTH  + (uint8_t)( FONT_16_WIDTH / 2 )+  2;
 	frame_y_start = menu->begin_.y_ * FONT_16_HEIGHT + FONT_16_HEIGHT / 2;
-	frame_x_end   = menu->end_.x_   * FONT_16_WIDTH  + (uint8_t)(FONT_16_WIDTH  / 2) + PLACE_FOR_SCROLLBAR;
+	frame_x_end   = menu->end_.x_   * FONT_16_WIDTH  + (uint8_t)( FONT_16_WIDTH / 2 ) + PLACE_FOR_SCROLLBAR;
 	frame_y_end   = menu->end_.y_   * FONT_16_HEIGHT + FONT_16_HEIGHT / 2;
 	
+	MENU_drawRectangle(frame_x_start, frame_y_start, frame_x_end, frame_y_end);
+}
+
+void MENU_printMenu(const MENU_Menu * const menu)
+{
+	__draw_Frame(menu);
 	//Paint_DrawNum(11*5,16*5,frame_y_end,&Font16,BLACK,WHITE);
 	
-	MENU_drawRectangle(frame_x_start, frame_y_start, frame_x_end, frame_y_end);
-	MENU_
+	
+	//MENU_
 }
 
 void MENU_updateMenu(const MENU_Menu * const menu)
