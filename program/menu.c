@@ -10,7 +10,6 @@
 
 volatile uint8_t start_flag = 0;
 
-MENU_Option menuS;
 
 void MENU_updateBreakpointNumber()
 {
@@ -111,6 +110,17 @@ void MENU_Browser_nextData()
 	MENU_printDataPage();
 	ENABLE_BUTTONS();
 }
+
+//initializng functions
+
+void MENU_init_ForwardingMenu()
+{
+	//I HAVE FINISHED HERE
+	MENU_initMenu(&forwarding_menu_,
+				  {fo})
+}
+
+//initializng functions END
 
 void MENU_browsingData()
 {
@@ -320,8 +330,8 @@ void MENU_drawRectangle(UWORD x_start, UWORD y_start, UWORD x_end, UWORD y_end)
 
 #define PLACE_FOR_SCROLLBAR 8
 
-#define UP 0
-#define DOWN 1
+#define UP   -1
+#define DOWN  1
 
 typedef uint8_t DIRECTION;
 
@@ -330,12 +340,74 @@ static void __update_Scrollbar(const MENU_Menu * const menu, const DIRECTION dir
 	//menu->lines_count_ 
 }
 
-static void __update_Text(const MENU_Menu * const menu, const DIRECTION direction )
+static inline uint8_t __determine_start_option(const MENU_Menu * const menu, const DIRECTION direction)
 {
-	static uint8_t start_x_cell = 0;
-	static uint8_t start_y_cell = 0;
+	if(direction == DOWN)
+		return menu->state_.displayed_range_.last_ + 1;
+	else return menu->state_.displayed_range_.first_ - 1;
+}
+
+static inline uint8_t __get_options_nmbr(const MENU_Menu * const menu, const DIRECTION direction)
+{
+	uint8_t available_lines   =  MENU_LINES_NMBR(menu);
+	uint8_t accumulated_lines = 0;
+	uint8_t options_to_print  = 0;
+	uint8_t current_option    = __determine_start_option(menu, direction);
 	
+	while(1)
+	{
+		if(current_option == 0 || current_option == menu->options_count_ - 1)
+			break;
+		
+		accumulated_lines += menu->options_[current_option + direction * options_to_print ].lines_nmbr_;
+		
+		if(accumulated_lines > available_lines)
+			break;
+		++options_to_print;
+	}
 	
+	return options_to_print;
+}
+
+static inline bool __is_scroll_avalaible(const MENU_Menu * const menu, const DIRECTION direction)
+{
+	if( ( menu->state_.displayed_range_.first_ == 0 && direction == UP ) ||
+	    ( menu->state_.displayed_range_.last_ == menu->options_count_ && direction == DOWN ))
+		return false;
+	return true;
+}
+
+static inline void __print_option(const MENU_Menu * const menu, const uint8_t option_nmbr)
+{
+	for_N(i , menu->options_[option_nmbr].lines_nmbr_)
+		MENU_printTextLine_NotSelected( menu->options_[option_nmbr].str_lines_[i] , 
+									    &WHOLE_LINE								  ,
+									    MENU_LEFT_X_LEFT_CELL_POS(menu)			  ,
+									    MENU_TOP_Y_CELL_POS(menu) + i  );
+}
+
+static inline void __update_state( MENU_Menu * const menu            , 
+								   const DIRECTION   direction       , 
+								   const uint8_t     options_printed   )
+{
+	menu->state_.displayed_range_.first_ += direction * options_printed; 
+	menu->state_.displayed_range_.last_ += direction * options_printed; 
+}
+
+//returns a 1 if mensu has to enroll , otherwise returns 0
+static uint8_t __update_Text(MENU_Menu * const menu , const DIRECTION direction )
+{
+	if( !__is_scroll_avalaible(menu,direction) )
+		return 0;
+	
+	uint8_t current_option    = __determine_start_option(menu, direction);
+	uint8_t options_to_print_ = __get_options_nmbr(menu,direction);
+	
+	for_N(i,  options_to_print_)
+		__print_option(menu, current_option + i * direction );
+
+	__update_state(menu, direction, options_to_print_);
+	return 1;
 }
 
 static void __draw_Frame(const MENU_Menu * const menu)

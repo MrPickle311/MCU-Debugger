@@ -75,9 +75,7 @@ void wipeFRAM()
 		FRAM_writeSingleByte(0,i);
 }
 
-#define PGM_STR(X) ( (const __flash char[]){ X } )//initializing conversion
 
-const __flash char* const __flash table1[] = { PGM_STR("Line1\0") , PGM_STR("Line2\0") , PGM_STR("Line3\0") };
 
 int main(void)
 {
@@ -118,11 +116,10 @@ int main(void)
 	range.x_start_ = 0;
 	range.x_end_   = 20;
 	
-	menuS.str_lines_ = table1[1];
-	
-	for(uint8_t i = 0 ; i < 7 ; ++i)
-		MENU_printTextLine_NotSelected(menuS.str_lines_ ,&range, 1, 12 + i);
-	
+	//for(uint8_t i = 0 ; i < 7 ; ++i)
+		MENU_printTextLine_NotSelected(forwarding_menu_.options_[0].str_lines_[1] ,&range, 1, 12 );
+		MENU_printTextLine_NotSelected(forwarding_menu_.options_[0].str_lines_[0] ,&range, 1, 13 );
+	forwarding_menu_.options_[0].option_service_();
 	Paint_DrawLine(20 * FONT_16_WIDTH + 6 , 
 				   12 * FONT_16_HEIGHT , 
 				   20 * FONT_16_WIDTH + 6 , 
