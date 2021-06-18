@@ -47,33 +47,60 @@ volatile struct MENU_TextRange
 
 typedef struct MENU_TextRange MENU_TextRange;
 
-MENU_TextRange WHOLE_LINE;
-
-#define TEXT_RANGE_DIFF(range)	( range.x_end_ - range.x_start_ )
+MENU_TextRange ENTIRE_LINE;
 
 struct MENU_State
 {
-	MENU_OptionRange displayed_range_;
+	uint8_t			 active_option_;
 };
 
 typedef struct MENU_State MENU_State;
 
-volatile struct MENU_Menu
+volatile struct MENU_Page
 {
 	MENU_Option* options_;
-	uint8_t      options_count_;
-	uint8_t      total_lines_count_;
-	MENU_Point   begin_;
-	MENU_Point   end_;
-	MENU_State   state_;
+	uint8_t		 options_count_;
+};
+
+typedef struct MENU_Page MENU_Page;
+
+void MENU_Page_init(MENU_Page* page, MENU_Option* options, uint8_t options_count);
+
+volatile struct MENU_PageBuffer
+{
+	MENU_Page* pages_;
+	uint8_t    buffer_size_;
+	uint8_t    buffer_pos_;
+};
+
+typedef struct MENU_PageBuffer MENU_PageBuffer;
+
+#define AT_CURRENT_PAGE(menu)			menu->page_buffer_.pages_[menu->page_buffer_.buffer_pos_]
+#define IN_PAGE_OPTIONS_COUNT(menu)		menu->page_buffer_.pages_[menu->page_buffer_.buffer_pos_].options_count_
+
+void MENU_PageBuffer_init(MENU_PageBuffer* buffer ,
+						  MENU_Page*	   pages  ,
+						  uint8_t		   size);
+
+MENU_Page*	MENU_PageBuffer_goNext(MENU_PageBuffer* buffer);
+
+MENU_Page*	MENU_PageBuffer_goPrevious(MENU_PageBuffer* buffer);
+
+volatile struct MENU_Menu
+{
+	MENU_PageBuffer page_buffer_;
+	uint8_t         options_count_;
+	MENU_Point      begin_;
+	MENU_Point      end_;
+	MENU_State      state_;
 };
 
 typedef struct MENU_Menu MENU_Menu;
 
 void MENU_initMenu(MENU_Menu*   menu				,
-				   MENU_Option* options				,
+				   MENU_Page*   pages				,
+				   uint8_t		pages_count			,
 				   uint8_t      options_count		,
-				   uint8_t      total_lines_count	,
 				   MENU_Point   begin				,
 				   MENU_Point   end					,
 				   MENU_State   state);
@@ -90,9 +117,9 @@ void MENU_initMenu(MENU_Menu*   menu				,
 
 extern MENU_Menu forwarding_menu_;
 
-extern MENU_Option forwarding_menu_option_1;
+extern MENU_Option forwarding_menu_options_page1[];
 
-extern MENU_Option forwarding_menu_option_2;
+extern MENU_Page  forwarding_menu_pages[];
 
 //forwarding_menu END
 

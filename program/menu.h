@@ -17,26 +17,35 @@
 
 volatile uint8_t start_flag;
 
-void MENU_printChar_NotSelected(const char chr,MENU_Point* start_point);
+#define UP   -1
+#define DOWN  1
 
-void MENU_printChar_Selected(const char chr,MENU_Point* start_point);
+typedef uint8_t DIRECTION;
+
+#define NOT_SELECTED  BLACK
+#define SELECTED      RED
+
+typedef uint16_t SELECTION;
+
+void MENU_printChar(const char chr			    , 
+				    MENU_Point* start_point     , 
+				    const SELECTION is_selected);
+
 
 //this function will return a -1 value if it encounter a '\0'
-int8_t MENU_printTextLine_NotSelected(const char __memx*		    str         , 
-							          const MENU_TextRange* const   text_slice  ,
-							          uint8_t		  				x_start_pos ,
-							          uint8_t						y_pos);
-
-int8_t MENU_printTextLine_Selected(const char* const			 str         , 
-								   const MENU_TextRange* const   text_slice  ,
-								   uint8_t		  				 x_start_pos ,
-								   uint8_t						 y_pos);
+int8_t MENU_printTextLine(const char __memx*		    str         , 
+						  const MENU_TextRange* const   text_slice  ,
+						  uint8_t		  				x_start_pos ,
+						  uint8_t						y_pos	    ,
+						  const SELECTION				is_selected);
 
 void MENU_drawRectangle(UWORD x_start, UWORD y_start, UWORD x_end, UWORD y_end);
 
+void MENU_clearPage(MENU_Menu * const menu);
+
 void MENU_printMenu(const MENU_Menu * const menu);
 
-void MENU_updateMenu(const MENU_Menu * const menu);
+void MENU_updateMenu(const MENU_Menu * const menu, const DIRECTION direction);
 
 void MENU_printSorroundingLines();
 

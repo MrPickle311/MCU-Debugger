@@ -115,9 +115,13 @@ void MENU_Browser_nextData()
 
 void MENU_init_ForwardingMenu()
 {
-	//I HAVE FINISHED HERE
-	MENU_initMenu(&forwarding_menu_,
-				  {fo})
+	MENU_initMenu( &forwarding_menu_,
+				   forwarding_menu_pages,
+				   2,
+				   3,
+				   (MENU_Point){ 3 , 7  } ,
+				   (MENU_Point){ 18, 11 } ,
+				   (MENU_State){ 0 }  );
 }
 
 //initializng functions END
@@ -241,30 +245,23 @@ void MENU_printChoiceMenu()
 	Paint_DrawNum(16*10,16*15,breakpoints_total_nmbr,&Font16,BLACK,WHITE);
 }
 
-void MENU_printChar_NotSelected(const char chr,MENU_Point* start_point)
+void MENU_printChar(const char chr			    , 
+				    MENU_Point* start_point     , 
+				    const SELECTION is_selected)
 {
 	Paint_DrawChar( start_point->x_ * FONT_16_WIDTH  ,
 				    start_point->y_ * FONT_16_HEIGHT ,
 				    chr								 ,
 				    &Font16							 ,
-				    BLACK							 ,
+				    is_selected					     ,
 				    WHITE);
 }
 
-void MENU_printChar_Selected(const char chr, MENU_Point* start_point)
-{
-	Paint_DrawChar( start_point->x_ * FONT_16_WIDTH  ,
-				    start_point->y_ * FONT_16_HEIGHT ,
-				    chr								 ,
-				    &Font16							 ,
-				    RED								 ,
-				    WHITE);        
-}
-
-int8_t MENU_printTextLine_NotSelected(const char __memx*		    str         , 
-							          const MENU_TextRange* const   text_slice  ,
-							          uint8_t		  			    x_start_pos ,
-							          uint8_t					    y_pos)
+int8_t MENU_printTextLine(const char __memx*		    str         , 
+						  const MENU_TextRange* const   text_slice  ,
+						  uint8_t		  				x_start_pos ,
+						  uint8_t						y_pos	    ,
+						  const SELECTION				is_selected)
 {
 	static const char __memx*       text_ptr     = NULL;
 	static MENU_Point			    char_point   = {0,0}; 
@@ -282,39 +279,10 @@ int8_t MENU_printTextLine_NotSelected(const char __memx*		    str         ,
 		if( *text_ptr == '\0' )
 			return - 1;
 		
-		MENU_printChar_NotSelected( *text_ptr, &char_point ); 
+		MENU_printChar( *text_ptr    , 
+						&char_point  , 
+						is_selected); 
 	
-		++char_point.x_;
-		++text_ptr;
-		++in_slice_pos;
-	}
-	
-	return text_slice->x_end_;
-}
-
-int8_t MENU_printTextLine_Selected(const char* const			  str         , 
-							       const MENU_TextRange* const    text_slice  ,
-							       uint8_t		  				  x_start_pos ,
-							       uint8_t						  y_pos)
-{
-	static const char __memx*       text_ptr     = NULL;
-	static MENU_Point			    char_point   = {0,0};
-	static uint8_t				    in_slice_pos = 0;
-	static uint8_t				    char_count   = 0;
-	
-	text_ptr      = &str[text_slice->x_start_];
-	char_point.x_ = x_start_pos;
-	char_point.y_ = y_pos;
-	in_slice_pos  = 0;
-	char_count    = text_slice->x_end_ - text_slice->x_start_ + 1;
-	
-	while( in_slice_pos <  char_count )
-	{
-		if( *text_ptr == '\0' )
-		return - 1;
-		
-		MENU_printChar_Selected( *text_ptr, &char_point );
-		
 		++char_point.x_;
 		++text_ptr;
 		++in_slice_pos;
@@ -328,17 +296,52 @@ void MENU_drawRectangle(UWORD x_start, UWORD y_start, UWORD x_end, UWORD y_end)
 	Paint_DrawRectangle(x_start, y_start, x_end , y_end, WHITE, 2, DRAW_FILL_EMPTY);
 }
 
+/*
+
 #define PLACE_FOR_SCROLLBAR 8
+#define SCROLLBAR_OFFSET	6
 
-#define UP   -1
-#define DOWN  1
-
-typedef uint8_t DIRECTION;
-
-static void __update_Scrollbar(const MENU_Menu * const menu, const DIRECTION direction)
+static inline void __print_scrollbar_line(uint8_t start_y    , 
+										  uint8_t end_y      ,
+										  uint8_t x          ,
+										  uint8_t width)
 {
-	//menu->lines_count_ 
+	Paint_DrawLine( x		, 
+				    start_y	, 
+				    x		,
+					end_y	, 
+				    RED		, 
+				    width	, 
+				    LINE_STYLE_SOLID);
 }
+*/
+
+/*
+#define THIN_LINE_WIDTH  2
+#define THICK_LINE_WIDTH 4
+
+
+
+static void __print_Scrollbar(const MENU_Menu * const menu)
+{
+	//a thin line
+	__print_scrollbar_line( MENU_TOP_Y_CELL_POS(menu) * FONT_16_HEIGHT       ,
+							menu->end_.y_ * FONT_16_HEIGHT				     , 
+						    menu->end_.x_ * FONT_16_WIDTH + SCROLLBAR_OFFSET , 
+						    THIN_LINE_WIDTH);
+	//a thick line
+	//POKOMBINUJ TAK: START = DLUGOSC CALEGO SUWAKA * ( OBECNA POZYCJA / ILOSC STRON )
+	// END = START + DLUGOSC CALEGO SUWAKA * ( 1 / ILOSC STRON )
+	uint8_t start = (uint8_t)( MENU_LINES_NMBR(menu) * (float)( menu->page_buffer_.buffer_pos_ / menu->page_buffer_.buffer_size_ ) ) * FONT_16_HEIGHT;
+	__print_scrollbar_line(  start,
+							( menu->end_.y_  ) * FONT_16_HEIGHT				     , 
+						     menu->end_.x_ * FONT_16_WIDTH + SCROLLBAR_OFFSET    , 
+						     THICK_LINE_WIDTH);
+}
+
+*/
+
+/*
 
 static inline uint8_t __determine_start_option(const MENU_Menu * const menu, const DIRECTION direction)
 {
@@ -369,74 +372,94 @@ static inline uint8_t __get_options_nmbr(const MENU_Menu * const menu, const DIR
 	return options_to_print;
 }
 
-static inline bool __is_scroll_avalaible(const MENU_Menu * const menu, const DIRECTION direction)
+*/
+
+static inline void __print_option(const MENU_Menu * const menu , 
+								  const MENU_Option* const opt , 
+								  const uint8_t start_line     , 
+								  const SELECTION is_selected)
 {
-	if( ( menu->state_.displayed_range_.first_ == 0 && direction == UP ) ||
-	    ( menu->state_.displayed_range_.last_ == menu->options_count_ && direction == DOWN ))
-		return false;
-	return true;
+	for_N( i ,opt->lines_nmbr_ )
+		MENU_printTextLine( opt->str_lines_[i]						   , 
+							&ENTIRE_LINE							   ,
+							MENU_LEFT_X_LEFT_CELL_POS(menu)			   ,
+							MENU_TOP_Y_CELL_POS(menu) + i + start_line ,
+							is_selected);
 }
 
-static inline void __print_option(const MENU_Menu * const menu, const uint8_t option_nmbr)
+static inline void __print_page( const MENU_Menu* const menu )
 {
-	for_N(i , menu->options_[option_nmbr].lines_nmbr_)
-		MENU_printTextLine_NotSelected( menu->options_[option_nmbr].str_lines_[i] , 
-									    &WHOLE_LINE								  ,
-									    MENU_LEFT_X_LEFT_CELL_POS(menu)			  ,
-									    MENU_TOP_Y_CELL_POS(menu) + i  );
+	uint8_t current_shift = 0;
+	SELECTION is_selected = NOT_SELECTED;
+	
+	for_N( i , IN_PAGE_OPTIONS_COUNT(menu) )
+	{
+		if(menu->state_.active_option_ == i)
+			is_selected = SELECTED;
+		else is_selected = NOT_SELECTED;
+		
+		__print_option(menu								  , 
+					   &AT_CURRENT_PAGE(menu).options_[i] ,
+					   current_shift					  ,
+					   is_selected);
+		
+		current_shift = AT_CURRENT_PAGE(menu).options_[i].lines_nmbr_;
+	}
 }
 
-static inline void __update_state( MENU_Menu * const menu            , 
+/*
+static inline void __update_State( MENU_Menu * const menu            , 
 								   const DIRECTION   direction       , 
 								   const uint8_t     options_printed   )
 {
 	menu->state_.displayed_range_.first_ += direction * options_printed; 
 	menu->state_.displayed_range_.last_ += direction * options_printed; 
 }
+*/
+
+void MENU_clearPage(MENU_Menu * const menu)
+{
+	Paint_ClearWindows( MENU_LEFT_X_LEFT_CELL_POS(menu)  * FONT_16_WIDTH   ,
+					    MENU_TOP_Y_CELL_POS(menu)        * FONT_16_HEIGHT  ,
+					    menu->end_.x_ * FONT_16_WIDTH					   ,
+					    menu->end_.y_	 * FONT_16_HEIGHT				   ,
+						BLACK);
+}
 
 //returns a 1 if mensu has to enroll , otherwise returns 0
-static uint8_t __update_Text(MENU_Menu * const menu , const DIRECTION direction )
-{
-	if( !__is_scroll_avalaible(menu,direction) )
-		return 0;
+static inline void __update_Text(MENU_Menu * const menu , const DIRECTION direction )
+{	
+	MENU_clearPage(menu);
 	
-	uint8_t current_option    = __determine_start_option(menu, direction);
-	uint8_t options_to_print_ = __get_options_nmbr(menu,direction);
+	if(direction == UP)
+		MENU_PageBuffer_goPrevious(&menu->page_buffer_);
+	else MENU_PageBuffer_goNext(&menu->page_buffer_);
 	
-	for_N(i,  options_to_print_)
-		__print_option(menu, current_option + i * direction );
-
-	__update_state(menu, direction, options_to_print_);
-	return 1;
+	__print_page(menu);
+	
 }
+
+#define FRAME_LEFTSIDE_OFFSET 2
 
 static void __draw_Frame(const MENU_Menu * const menu)
 {
-	static uint16_t frame_x_start = 0;
-	static uint16_t frame_y_start = 0;
-	static uint16_t frame_x_end   = 0;
-	static uint16_t frame_y_end   = 0;
-	
-	frame_x_start = menu->begin_.x_ * FONT_16_WIDTH  + (uint8_t)( FONT_16_WIDTH / 2 )+  2;
-	frame_y_start = menu->begin_.y_ * FONT_16_HEIGHT + FONT_16_HEIGHT / 2;
-	frame_x_end   = menu->end_.x_   * FONT_16_WIDTH  + (uint8_t)( FONT_16_WIDTH / 2 ) + PLACE_FOR_SCROLLBAR;
-	frame_y_end   = menu->end_.y_   * FONT_16_HEIGHT + FONT_16_HEIGHT / 2;
-	
-	MENU_drawRectangle(frame_x_start, frame_y_start, frame_x_end, frame_y_end);
+	MENU_drawRectangle( menu->begin_.x_ * FONT_16_WIDTH  + (uint8_t)( FONT_16_WIDTH / 2 ) + FRAME_LEFTSIDE_OFFSET ,
+					    menu->begin_.y_ * FONT_16_HEIGHT + FONT_16_HEIGHT / 2									  , 
+						menu->end_.x_   * FONT_16_WIDTH  + (uint8_t)( FONT_16_WIDTH / 2 )						  ,
+						menu->end_.y_   * FONT_16_HEIGHT + FONT_16_HEIGHT / 2 );
 }
 
 void MENU_printMenu(const MENU_Menu * const menu)
 {
 	__draw_Frame(menu);
-	//Paint_DrawNum(11*5,16*5,frame_y_end,&Font16,BLACK,WHITE);
-	
-	
-	//MENU_
+	__print_page(menu);
 }
 
-void MENU_updateMenu(const MENU_Menu * const menu)
+void MENU_updateMenu(const MENU_Menu * const menu, const DIRECTION direction)
 {
-	
+	__update_Text(menu , direction);
+	//__print_Scrollbar( menu, direction );
+	//__update_State( menu, direction, options_printed );
 }
 
 void MENU_printStartMenu()
@@ -459,7 +482,6 @@ void MENU_serviceStartMenu()
 	COM_commandProcessor();// i have guarannce that data receiving will end until next line
 	ENABLE_BUTTONS();
 }
-
 
 void MENU_navigate()
 {
