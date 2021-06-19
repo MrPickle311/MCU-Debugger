@@ -15,15 +15,15 @@
 #include "com.h"
 #include "menu_objects.h"
 
-volatile uint8_t start_flag;
+
 
 #define UP   -1
 #define DOWN  1
 
 typedef uint8_t DIRECTION;
 
-#define NOT_SELECTED  BLACK
-#define SELECTED      RED
+#define NOT_SELECTED		   BLACK
+#define SELECTED			   RED
 
 typedef uint16_t SELECTION;
 
@@ -31,6 +31,8 @@ void MENU_printChar(const char chr			    ,
 				    MENU_Point* start_point     , 
 				    const SELECTION is_selected);
 
+void MENU_printNumber(uint16_t nmbr , 
+				      MENU_Point* start_point);
 
 //this function will return a -1 value if it encounter a '\0'
 int8_t MENU_printTextLine(const char __memx*		    str         , 
@@ -39,38 +41,34 @@ int8_t MENU_printTextLine(const char __memx*		    str         ,
 						  uint8_t						y_pos	    ,
 						  const SELECTION				is_selected);
 
-void MENU_drawRectangle(UWORD x_start, UWORD y_start, UWORD x_end, UWORD y_end);
+void MENU_drawRectangle(UWORD x_start , 
+						UWORD y_start , 
+						UWORD x_end   , 
+						UWORD y_end);
+
+void MENU_wipeAll();
+
+void MENU_printMessage(const MENU_Message* const msg);
 
 void MENU_clearPage(MENU_Menu * const menu);
 
 void MENU_printMenu(const MENU_Menu * const menu);
 
-void MENU_updateMenu(const MENU_Menu * const menu, const DIRECTION direction);
+void MENU_updateCurrentPage(const MENU_Menu * const menu, const DIRECTION direction);
 
-void MENU_printSorroundingLines();
+void MENU_goNextOption(MENU_Menu * const menu);
+
+void MENU_goPreviousOption(MENU_Menu * const menu);
+
+void MENU_move(MENU_Menu * const menu, const DIRECTION direction);
+
+
+//printing of all menus
+
+void MENU_printForwardingMenu();
 
 void MENU_printStartMenu();
 
-void MENU_navigate();
-
-void MENU_printChoiceMenu();
-
-void MENU_printDataCell(uint8_t start_line);
-
-void MENU_printBottom();
-
-void MENU_printHeaderBody();
-
-void MENU_loadNextBreakpoint();
-
-void MENU_Browser_nextBreakpoint();
-
-void MENU_Browser_nextData();
-
-//initializng functions
-
-void MENU_init_ForwardingMenu();
-
-//initializng functions END
+//printing of all menus END
 
 #endif /* MENU_H_ */

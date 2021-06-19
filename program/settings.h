@@ -9,7 +9,7 @@
 #ifndef SETTINGS_H_
 #define SETTINGS_H_
 
-#define FRAM_SIZE 32768
+#define FRAM_SIZE 32768 //bytes
 
 #include "../drivers/fram/fram_circular_buffer.h"
 

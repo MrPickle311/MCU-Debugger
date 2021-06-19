@@ -15,7 +15,7 @@
 #include <avr/interrupt.h>
 #include "drivers/core/timer.h"
 #include "program/debounce.h"
-#include "program/menu.h"
+#include "program/menu_logic.h"
 #include "program/com.h"
 #include "tests/fram_buffer_test.h"
 #include <avr/pgmspace.h>
@@ -115,35 +115,24 @@ int main(void)
 	MENU_TextRange range;
 	range.x_start_ = 0;
 	range.x_end_   = 20;
-	MENU_init_ForwardingMenu();
+	//MENU_init_ForwardingMenu();
+	//MENU_printForwardingMenu();
+	MENU_init_StartMenu();
+	MENU_printStartMenu();
+	MENU_printMessage(&updating_data_msg);
 	//for(uint8_t i = 0 ; i < 7 ; ++i)
 		//MENU_printTextLine_NotSelected(forwarding_menu_.options_[0].str_lines_[0] ,&range, 1, 12 );
 		//MENU_printTextLine_NotSelected(forwarding_menu_.options_[0].str_lines_[1] ,&range, 1, 13 );
 		//MENU_printTextLine_NotSelected(forwarding_menu_.options_[1].str_lines_[0] ,&range, 1, 14 );
 	
-	MENU_printMenu(&forwarding_menu_);
-	MENU_clearPage(&forwarding_menu_);
-	forwarding_menu_.state_.active_option_ = 1;
-	MENU_printMenu(&forwarding_menu_);
+	//MENU_printMenu(&forwarding_menu_);
+	//MENU_clearPage(&forwarding_menu_);
+	
+	//MENU_goNextOption(&forwarding_menu_);
+	//MENU_printMenu(&forwarding_menu_);
+	
 	//forwarding_menu_.options_[0].option_service_();
 	
-	/*
-	Paint_DrawLine(20 * FONT_16_WIDTH + 6 , 
-				   12 * FONT_16_HEIGHT , 
-				   20 * FONT_16_WIDTH + 6 , 
-				   19 * FONT_16_HEIGHT ,
-				   RED , 
-				   2 , 
-				   LINE_STYLE_SOLID);
-	
-	Paint_DrawLine(20 * FONT_16_WIDTH + 6 ,
-				   12 * FONT_16_HEIGHT ,
-				   20 * FONT_16_WIDTH + 6 ,
-				   14 * FONT_16_HEIGHT ,
-				   RED ,
-				   4 ,
-				   LINE_STYLE_SOLID);
-	*/
 	
 	//sei();
 	//fram_test1();

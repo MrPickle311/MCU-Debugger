@@ -23,6 +23,8 @@ volatile struct MENU_Option
 
 typedef struct MENU_Option MENU_Option;
 
+#define FIRST_OPTION_AT_START  0
+
 struct MENU_OptionRange
 {
 	uint8_t first_;
@@ -97,6 +99,15 @@ volatile struct MENU_Menu
 
 typedef struct MENU_Menu MENU_Menu;
 
+volatile struct MENU_Message
+{
+	flash_string_array_t str_lines_;
+	uint8_t				 lines_nmbr_;
+	MENU_Point			 begin_;
+};
+
+typedef struct MENU_Message MENU_Message;
+
 void MENU_initMenu(MENU_Menu*   menu				,
 				   MENU_Page*   pages				,
 				   uint8_t		pages_count			,
@@ -113,14 +124,38 @@ void MENU_initMenu(MENU_Menu*   menu				,
 #define MENU_LINES_NMBR(menu)			  ( menu->end_.y_ - menu->begin_.y_ - 1 )
 #define MENU_IN_LINE_CHARS_NMBR(menu)	  ( menu->end_.x_ - menu->begin_.x_ - 1 )
 
+//messages
+
+extern MENU_Message updating_data_msg;
+
+//messages END
+
 //forwarding_menu
 
-extern MENU_Menu forwarding_menu_;
+extern MENU_Menu   forwarding_menu_;
 
 extern MENU_Option forwarding_menu_options_page1[];
 
-extern MENU_Page  forwarding_menu_pages[];
+extern MENU_Page   forwarding_menu_pages[];
 
 //forwarding_menu END
+
+//start_menu
+
+extern MENU_Menu   start_menu_;
+
+extern MENU_Option start_menu_options_page1[];
+
+extern MENU_Page   start_menu_pages[];
+
+//start_menu END
+
+//initializng functions
+
+void MENU_init_ForwardingMenu();
+
+void MENU_init_StartMenu();
+
+//initializng functions END
 
 #endif /* MENU_OBJECTS_H_ */
