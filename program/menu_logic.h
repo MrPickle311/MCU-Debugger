@@ -11,11 +11,9 @@
 
 #include "menu_gui.h"
 
-volatile uint8_t start_flag;
-
 void MENU_printSorroundingLines();
 
-void MENU_navigate();
+void MENU_start();
 
 void MENU_printDataCell(uint8_t start_line);
 
@@ -29,5 +27,16 @@ void MENU_Browser_nextBreakpoint();
 
 void MENU_Browser_nextData();
 
+//initialization
+
+void MENU_init_ForwardingMenu();
+
+void MENU_init_StartMenu();
+
+void MENU_init_BrowsingMenu();
+
+void MENU_Init();
+
+//initialization END
 
 #endif /* MENU_LOGIC_H_ */

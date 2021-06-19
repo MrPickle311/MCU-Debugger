@@ -297,7 +297,8 @@ void MENU_wipeAll()
 
 void MENU_printForwardingMenu()
 {
-	MENU_printMenu(&forwarding_menu_);
+	MENU_wipeAll();
+	MENU_printMenu(&forwarding_menu);
 	
 	MENU_printTextLine( PSTR("Breakpoints: " ) ,
 						&ENTIRE_LINE	       ,
@@ -311,9 +312,14 @@ void MENU_printForwardingMenu()
 
 void MENU_printStartMenu()
 {
-	MENU_printMenu(&start_menu_);
-	
-	
+	MENU_wipeAll();
+	MENU_printMenu(&start_menu);
+}
+
+void MENU_printBrowsingMenu()
+{
+	MENU_wipeAll();
+	MENU_printMenu(&browsing_menu);
 }
 
 //printing of all menus END

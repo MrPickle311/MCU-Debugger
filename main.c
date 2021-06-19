@@ -84,12 +84,16 @@ int main(void)
 	//configureTWISlave();
 	//configureTWIMaster();
 	configureLCD();
-	//configureDebouncingTimer();
-	//debounce_init();
+	configureDebouncingTimer();
+	debounce_init();
 	
 	//wipeFRAM(); this function slow debugger ,so i tunred it off
 	//_delay_ms(300);
+	sei();
+	MENU_Init();
+	MENU_start();
 	
+	/* 
 	MENU_Menu menu1;
 	menu1.begin_.x_ = 0;
 	menu1.begin_.y_ = 0;
@@ -108,33 +112,12 @@ int main(void)
 	menu3.end_.x_ = 20;
 	menu3.end_.y_ = 19;
 	
-	//MENU_printMenu(&menu1);
-	//MENU_printMenu(&menu2);
-	//MENU_printMenu(&menu3);
-	
-	MENU_TextRange range;
-	range.x_start_ = 0;
-	range.x_end_   = 20;
-	//MENU_init_ForwardingMenu();
-	//MENU_printForwardingMenu();
-	MENU_init_StartMenu();
-	MENU_printStartMenu();
-	MENU_printMessage(&updating_data_msg);
-	//for(uint8_t i = 0 ; i < 7 ; ++i)
-		//MENU_printTextLine_NotSelected(forwarding_menu_.options_[0].str_lines_[0] ,&range, 1, 12 );
-		//MENU_printTextLine_NotSelected(forwarding_menu_.options_[0].str_lines_[1] ,&range, 1, 13 );
-		//MENU_printTextLine_NotSelected(forwarding_menu_.options_[1].str_lines_[0] ,&range, 1, 14 );
-	
-	//MENU_printMenu(&forwarding_menu_);
-	//MENU_clearPage(&forwarding_menu_);
-	
-	//MENU_goNextOption(&forwarding_menu_);
-	//MENU_printMenu(&forwarding_menu_);
-	
-	//forwarding_menu_.options_[0].option_service_();
+	MENU_printMenu(&menu1);
+	MENU_printMenu(&menu2);
+	MENU_printMenu(&menu3);
+	*/
 	
 	
-	//sei();
 	//fram_test1();
 	//fram_test2();
 	//fram_test3();

@@ -12,12 +12,13 @@
 #define BUTTON_PIN PIND
 #define BUTTON_DDR DDRD
 
-#define RIGHT_BUTTON_MASK ( 1<<DDD3 )
-#define LEFT_BUTTON_MASK  ( 1<<DDD4 )
-#define OK_BUTTON_MASK    ( 1<<DDD5 )
-#define BACK_BUTTON_MASK  ( 1<<DDD6 )
+#define RIGHT_BUTTON_MASK	( 1<<DDD3 )
+#define LEFT_BUTTON_MASK	( 1<<DDD4 )
+#define OK_BUTTON_MASK		( 1<<DDD5 )
+#define BACK_BUTTON_MASK	( 1<<DDD6 )
+#define SWITCH_BUTTON_MASK  ( 1<<DDD2 )
 
-#define BUTTON_MASK (RIGHT_BUTTON_MASK | LEFT_BUTTON_MASK | OK_BUTTON_MASK | BACK_BUTTON_MASK)
+#define BUTTON_MASK ( SWITCH_BUTTON_MASK | RIGHT_BUTTON_MASK | LEFT_BUTTON_MASK | OK_BUTTON_MASK | BACK_BUTTON_MASK )
 
 #define ENABLE_BUTTONS()	TIMER_releaseAsynchronousTimer()
 #define DISABLE_BUTTONS()	TIMER_haltAsynchronousTimer()
@@ -28,6 +29,10 @@ extern volatile uint8_t buttons_down;
 
 // Return non-zero if a button matching mask is pressed.
 uint8_t button_down(uint8_t button_mask);
+
+uint8_t get_pressed_button_code();
+
+#define WAIT_FOR_BUTTON_PRESS(btn)	while(!button_down(##btn##_BUTTON_MASK))
 
 // Make button pins inputs and activate internal pullups.
 void debounce_init(void);

@@ -63,11 +63,13 @@ void MENU_goPreviousOption(MENU_Menu * const menu);
 void MENU_move(MENU_Menu * const menu, const DIRECTION direction);
 
 
-//printing of all menus
+//printing certain menus
 
 void MENU_printForwardingMenu();
 
 void MENU_printStartMenu();
+
+void MENU_printBrowsingMenu();
 
 //printing of all menus END
 

@@ -8,6 +8,12 @@
 #include "menu_objects.h"
 #include "../drivers/lcd/GUI_Paint.h"
 
+void MENU_resetMenuView(MENU_Menu* const menu)
+{
+	menu->state_.active_option_    = 0;
+	menu->page_buffer_.buffer_pos_ = 0;
+}
+
 void MENU_initMenu( MENU_Menu*   menu			,
 				    MENU_Page*   pages			,
 				    uint8_t		 pages_count	,
@@ -25,7 +31,15 @@ void MENU_initMenu( MENU_Menu*   menu			,
 	MENU_PageBuffer_init(&menu->page_buffer_, pages , pages_count);
 }
 
-MENU_TextRange ENTIRE_LINE = { 0, 22 };
+void MENU_assignActions( MENU_Menu* const menu			,
+						 option_service_t ok_action		, 
+					     option_service_t back_action	, 
+					     option_service_t switch_action)
+{
+	//EMPTY
+}
+
+volatile const MENU_TextRange ENTIRE_LINE = { 0, 22 };
 
 void MENU_Page_init(MENU_Page* page, MENU_Option* options, uint8_t options_count)
 {
@@ -80,18 +94,20 @@ MENU_Message updating_data_msg = {
 
 //forwarding_menu
 
-MENU_Menu forwarding_menu_;
+MENU_Menu forwarding_menu;
 
 MENU_Option forwarding_menu_options_page1[] = {
 	{
 		forwarding_menu_option1_string ,
 		2 ,
-		NULL
+		NULL						,
+		NULL						
 	} ,
 	{
 		forwarding_menu_option2_string ,
 		1 ,
-		NULL
+		NULL						,
+		NULL						
 	}
 };
 
@@ -104,9 +120,41 @@ MENU_Page  forwarding_menu_pages[] = {
 
 //forwarding_menu END
 
+//browsing menu
+
+MENU_Menu   browsing_menu;
+
+#define BROWSING_MENU_PAGE_1_OPTIONS_COUNT 1
+
+MENU_Option browsing_menu_options_page1[] = {
+	{
+		browsing_menu_option1_string ,
+		1							 ,
+		NULL						 ,
+		NULL
+	} ,
+	{
+		browsing_menu_option2_string ,
+		1 ,
+		NULL						,
+		NULL
+	}
+};
+
+
+
+MENU_Page   browsing_menu_pages[] = {
+	{
+		browsing_menu_options_page1		,
+		BROWSING_MENU_PAGE_1_OPTIONS_COUNT
+	}
+};
+
+//browsing menu END
+
 //start_menu
 
-MENU_Menu   start_menu_;
+MENU_Menu   start_menu;
 
 #define START_MENU_PAGE_1_OPTIONS_COUNT 1
 
@@ -114,7 +162,8 @@ MENU_Option start_menu_options_page1[] = {
 	{
 		start_menu_option1_string	,
 		1							,
-		NULL
+		NULL						,
+		NULL						
 	}
 };
 
@@ -127,44 +176,3 @@ MENU_Page   start_menu_pages[] = {
 
 //start_menu END
 
-//initializng functions
-
-#define FORWARDING_MENU_PAGES_NMBR    1
-#define FORWARDING_MENU_OPTIONS_COUNT 2
-
-#define FORWARDING_MENU_X_BEGIN		  3
-#define FORWARDING_MENU_Y_BEGIN		  7
-#define FORWARDING_MENU_X_END 		  18
-#define FORWARDING_MENU_Y_END 		  11
-
-void MENU_init_ForwardingMenu()
-{
-	MENU_initMenu( &forwarding_menu_												 ,
-				   forwarding_menu_pages											 ,
-				   FORWARDING_MENU_PAGES_NMBR										 ,
-				   FORWARDING_MENU_OPTIONS_COUNT									 ,
-				   (MENU_Point){ FORWARDING_MENU_X_BEGIN , FORWARDING_MENU_Y_BEGIN } ,
-				   (MENU_Point){ FORWARDING_MENU_X_END   , FORWARDING_MENU_Y_END   } ,
-				   (MENU_State){ FIRST_OPTION_AT_START }  );
-}
-
-#define START_MENU_PAGES_NMBR     1
-#define START_MENU_OPTIONS_COUNT  1
-
-#define START_MENU_X_BEGIN		  8
-#define START_MENU_Y_BEGIN		  7
-#define START_MENU_X_END 		  14
-#define START_MENU_Y_END 		  9
-
-void MENU_init_StartMenu()
-{
-	MENU_initMenu( &start_menu_											   ,
-				   start_menu_pages										   ,
-				   START_MENU_PAGES_NMBR								   ,
-				   START_MENU_OPTIONS_COUNT								   ,
-				   (MENU_Point){ START_MENU_X_BEGIN , START_MENU_Y_BEGIN } ,
-				   (MENU_Point){ START_MENU_X_END   , START_MENU_Y_END   } ,
-				   (MENU_State){ FIRST_OPTION_AT_START }  );
-}
-
-//initializng functions END

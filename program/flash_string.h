@@ -30,6 +30,14 @@ extern flash_const_string_t forwarding_menu_option2_string[];
 
 //FORWARDING MENU END
 
+//BROWSING MENU
+
+extern flash_const_string_t browsing_menu_option1_string[];
+
+extern flash_const_string_t browsing_menu_option2_string[];
+
+//BROWSING MENU END
+
 //START MENU
 
 extern flash_const_string_t start_menu_option1_string[];

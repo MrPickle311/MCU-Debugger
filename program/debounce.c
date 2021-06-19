@@ -17,12 +17,19 @@ uint8_t button_down(uint8_t button_mask)
 	return button_mask;
 }
 
+
+uint8_t get_pressed_button_code()
+{
+	return buttons_down;
+}
+
 static inline void __resetButtons()
 {
 	button_down(LEFT_BUTTON_MASK);
 	button_down(RIGHT_BUTTON_MASK);
 	button_down(OK_BUTTON_MASK);
 	button_down(BACK_BUTTON_MASK);
+	button_down(SWITCH_BUTTON_MASK);
 }
 
 void debounce_init(void)
