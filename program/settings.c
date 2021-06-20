@@ -17,7 +17,6 @@ volatile FRAM_CircularBuffer fram_buffer;
 
 void resetLoadBreakpoint()
 {
-	//UPDATE_SAVE_POS();
 	current_breakpoint_to_load = 0;
 	FRAM_CircularBuffer_reconfigure(fram_buffer,GET_BREAKPOINT_START_ADDRESS(0), GET_BREAKPOINT_END_ADDRESS(0));
 	FRAM_CircularBuffer_injectSavePosition(fram_buffer,current_fram_push_positions[current_breakpoint_to_load]);
@@ -28,7 +27,7 @@ void resetSaveBreakpoint()
 	FRAM_CircularBuffer_reconfigure(fram_buffer,GET_BREAKPOINT_START_ADDRESS(current_breakpoint_to_save), GET_BREAKPOINT_END_ADDRESS(current_breakpoint_to_save));
 }
 
-void goToNextSaveBreakpoint()//te dwie linijki nastêpuj¹ po sobie , co jest przyczyn¹ buga
+void goToNextSaveBreakpoint()
 {
 	current_fram_push_positions[current_breakpoint_to_save] = FRAM_CircularBuffer_getFillLevel(fram_buffer);
 	current_breakpoint_to_save = ( current_breakpoint_to_save + 1 ) % breakpoints_total_nmbr;

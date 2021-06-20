@@ -23,8 +23,8 @@ void MENU_initMenu( MENU_Menu*   menu			,
 				    MENU_State   state)
 {
 	menu->options_count_        = options_count;
-	menu->begin_			    = begin;
-	menu->end_				    = end;
+	menu->area_.begin_			= begin;
+	menu->area_.end_			= end;
 	menu->state_			    = state;
 	menu->state_.active_option_ = 0;
 	
@@ -84,10 +84,20 @@ MENU_Page* MENU_PageBuffer_goPrevious(MENU_PageBuffer* buffer)
 #define UPDATING_DATA_MSG_X_BEGIN     3
 #define UPDATING_DATA_MSG_Y_BEGIN     9
 
-MENU_Message updating_data_msg = {
+const __flash MENU_Message updating_data_msg = {
 	updating_data_msg_string											, 
 	UPDATING_DATA_MSG_LINES_COUNT										, 
 	(MENU_Point){ UPDATING_DATA_MSG_X_BEGIN , UPDATING_DATA_MSG_Y_BEGIN }
+};
+
+#define CONNECTED_WITH_DEVICE_MSG_LINES_COUNT 2
+#define CONNECTED_WITH_DEVICE_MSG_X_BEGIN     3
+#define CONNECTED_WITH_DEVICE_MSG_Y_BEGIN     9
+
+const __flash MENU_Message connected_with_device_msg = {
+	connected_with_device_data_msg_string												,
+	CONNECTED_WITH_DEVICE_MSG_LINES_COUNT												,
+	(MENU_Point){ CONNECTED_WITH_DEVICE_MSG_X_BEGIN , CONNECTED_WITH_DEVICE_MSG_Y_BEGIN }
 };
 
 //messages END
@@ -124,7 +134,7 @@ MENU_Page  forwarding_menu_pages[] = {
 
 MENU_Menu   browsing_menu;
 
-#define BROWSING_MENU_PAGE_1_OPTIONS_COUNT 1
+#define BROWSING_MENU_PAGE_1_OPTIONS_COUNT 2
 
 MENU_Option browsing_menu_options_page1[] = {
 	{
@@ -135,13 +145,11 @@ MENU_Option browsing_menu_options_page1[] = {
 	} ,
 	{
 		browsing_menu_option2_string ,
-		1 ,
-		NULL						,
+		1							 ,
+		NULL						 ,
 		NULL
 	}
 };
-
-
 
 MENU_Page   browsing_menu_pages[] = {
 	{

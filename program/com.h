@@ -35,8 +35,6 @@ enum Command
 
 void COM_getVariable();
 
-void COM_getArray();
-
 void COM_configureDevice();
 
 void COM_commandProcessor();

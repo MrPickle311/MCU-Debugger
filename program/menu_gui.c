@@ -77,15 +77,15 @@ void MENU_drawRectangle(UWORD x_start, UWORD y_start, UWORD x_end, UWORD y_end)
 						 DRAW_FILL_EMPTY);
 }
 
-void MENU_printMessage(const MENU_Message* const msg)
+void MENU_printMessage(const MENU_Message __memx* const msg)
 {
 	MENU_wipeAll();
 	for_N( i , msg->lines_nmbr_)
-		MENU_printTextLine(msg->str_lines_[i] ,
-						   &ENTIRE_LINE       ,
-						   msg->begin_.x_     ,
-						   msg->begin_.y_ + i ,
-						   NOT_SELECTED);
+		MENU_printTextLine( msg->str_lines_[i] ,
+						    &ENTIRE_LINE       ,
+						    msg->begin_.x_     ,
+						    msg->begin_.y_ + i ,
+						    NOT_SELECTED);
 }
 
 /*
@@ -166,16 +166,16 @@ static inline uint8_t __get_options_nmbr(const MENU_Menu * const menu, const DIR
 
 */
 
-static inline void __print_option(const MENU_Menu * const menu , 
-								  const MENU_Option* const opt , 
-								  const uint8_t start_line     , 
-								  const SELECTION is_selected)
+static inline void __print_option( const MENU_Menu * const menu , 
+								   const MENU_Option* const opt , 
+								   const uint8_t start_line     , 
+								   const SELECTION is_selected)
 {
 	for_N( i , opt->lines_nmbr_ )
-		MENU_printTextLine( opt->str_lines_[i]						   , 
-							&ENTIRE_LINE							   ,
-							MENU_LEFT_X_LEFT_CELL_POS(menu)			   ,
-							MENU_TOP_Y_CELL_POS(menu) + i + start_line ,
+		MENU_printTextLine( opt->str_lines_[i]									, 
+							&ENTIRE_LINE										,
+							AREA_LEFT_X_LEFT_CELL_POS(menu->area_)			    ,
+							AREA_TOP_Y_CELL_POS(menu->area_) + i + start_line	,
 							is_selected);
 }
 
@@ -209,19 +209,19 @@ static inline void __update_State( MENU_Menu * const menu            ,
 }
 */
 
-void MENU_clearPage(MENU_Menu * const menu)
+void MENU_clearArea(const MENU_Area * const area)
 {
-	Paint_ClearWindows( MENU_LEFT_X_LEFT_CELL_POS(menu)  * FONT_16_WIDTH   ,
-					    MENU_TOP_Y_CELL_POS(menu)        * FONT_16_HEIGHT  ,
-					    menu->end_.x_ * FONT_16_WIDTH					   ,
-					    menu->end_.y_	 * FONT_16_HEIGHT				   ,
+	Paint_ClearWindows( AREA_LEFT_X_LEFT_CELL_POS((*area))  * FONT_16_WIDTH   ,
+					    AREA_TOP_Y_CELL_POS((*area))        * FONT_16_HEIGHT  ,
+					    area->end_.x_	* FONT_16_WIDTH						  ,
+					    area->end_.y_	* FONT_16_HEIGHT					  ,
 						BLACK);
 }
 
 //returns a 1 if mensu has to enroll , otherwise returns 0
 static inline void __update_Text(MENU_Menu * const menu , const DIRECTION direction )
 {	
-	MENU_clearPage(menu);
+	MENU_clearArea(&menu->area_);
 	
 	if(direction == UP)
 		MENU_PageBuffer_goPrevious(&menu->page_buffer_);
@@ -235,10 +235,10 @@ static inline void __update_Text(MENU_Menu * const menu , const DIRECTION direct
 
 static void __draw_Frame(const MENU_Menu * const menu)
 {
-	MENU_drawRectangle( menu->begin_.x_ * FONT_16_WIDTH  + (uint8_t)( FONT_16_WIDTH / 2 ) + FRAME_LEFTSIDE_OFFSET ,
-					    menu->begin_.y_ * FONT_16_HEIGHT + FONT_16_HEIGHT / 2									  , 
-						menu->end_.x_   * FONT_16_WIDTH  + (uint8_t)( FONT_16_WIDTH / 2 )						  ,
-						menu->end_.y_   * FONT_16_HEIGHT + FONT_16_HEIGHT / 2 );
+	MENU_drawRectangle( menu->area_.begin_.x_ * FONT_16_WIDTH  + (uint8_t)( FONT_16_WIDTH / 2 ) + FRAME_LEFTSIDE_OFFSET ,
+					    menu->area_.begin_.y_ * FONT_16_HEIGHT + FONT_16_HEIGHT / 2										, 
+						menu->area_.end_.x_   * FONT_16_WIDTH  + (uint8_t)( FONT_16_WIDTH / 2 )							,
+						menu->area_.end_.y_   * FONT_16_HEIGHT + FONT_16_HEIGHT / 2 );
 }
 
 void MENU_printMenu(const MENU_Menu * const menu)
@@ -306,9 +306,10 @@ void MENU_printForwardingMenu()
 						BRKP_TEXT_Y_START_POS  ,
 						NOT_SELECTED);
 	
-	MENU_printNumber(breakpoints_total_nmbr,
-					 &(MENU_Point){ BRKP_NMBR_X_START_POS , BRKP_NMBR_Y_START_POS } );
+	MENU_printNumber( breakpoints_total_nmbr											,
+					  &(MENU_Point){ BRKP_NMBR_X_START_POS , BRKP_NMBR_Y_START_POS } );
 }
+
 
 void MENU_printStartMenu()
 {

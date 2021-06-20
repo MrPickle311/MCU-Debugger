@@ -38,11 +38,6 @@ void COM_getVariable()
 	FRAM_CircularBuffer_safePush(fram_buffer,TWI_Buffer_AtCurrentByte(TWI0_Buffer));// '\0' 
 }
 
-void COM_getArray()
-{
-	//TODO:
-}
-
 void COM_configureDevice()
 {
 	configureDebuggerFRAM(TWI_Buffer_AtByte(TWI0_Buffer,1));
@@ -58,9 +53,8 @@ void COM_commandProcessor()
 			switch(TWI_Buffer_AtByte(TWI0_Buffer,0))
 			{
 				case DEVICE_START:
-				
-					Paint_DrawString_EN(16*6,16*10,"Start",&Font16,GREEN,WHITE);
-					Paint_DrawRectangle(16*6 - 5,16*10 - 5,16*6+16*4,16*10 + 16,WHITE,2,DRAW_FILL_EMPTY);
+					//Paint_DrawString_EN(16*6,16*10,"Start",&Font16,GREEN,WHITE);
+					//Paint_DrawRectangle(16*6 - 5,16*10 - 5,16*6+16*4,16*10 + 16,WHITE,2,DRAW_FILL_EMPTY);
 					COM_configureDevice();
 					TWI0_emptyBuffer();
 					break;
@@ -76,8 +70,9 @@ void COM_commandProcessor()
 					proccessing_flag = false;
 					break;
 				default:
-					Paint_Clear(BLACK);
-					Paint_DrawString_EN(0,0, "ERROR!",&Font16,BLACK,WHITE);
+					//CHANGE TO PRINT A MENU_MESSAGE
+					//Paint_Clear(BLACK);
+					//Paint_DrawString_EN(0,0, "ERROR!",&Font16,BLACK,WHITE);
 					while(1);
 			}
 		}

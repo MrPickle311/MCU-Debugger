@@ -18,9 +18,21 @@ uint8_t button_down(uint8_t button_mask)
 }
 
 
-uint8_t get_pressed_button_code()
+BUTTON_ID get_pressed_button_id()
 {
-	return buttons_down;
+	if(button_down(RIGHT_BUTTON_MASK))
+		return RIGHT_BUTTON_ID;
+	
+	else  if (button_down(LEFT_BUTTON_MASK))
+		return LEFT_BUTTON_ID;
+	
+	else  if (button_down(OK_BUTTON_MASK))
+		return OK_BUTTON_ID;
+	
+	else  if (button_down(BACK_BUTTON_MASK))
+		return BACK_BUTTON_ID;
+	
+	return NO_BUTTON_PRESSED;
 }
 
 static inline void __resetButtons()

@@ -9,27 +9,36 @@
 
 inline static void empty(){MENU_printNumber(6,&(MENU_Point){5 ,5 } );}
 
-void MENU_activateForwardingMenu()
+inline static  void MENU_activateForwardingMenu()
 {
 	MENU_printForwardingMenu();
 	MENU_ButtonsService(&forwarding_menu);
 }
 
-void MENU_activateBrowsingMenu()
+inline static  void MENU_activateBrowsingMenu()
 {
 	MENU_printBrowsingMenu();
 	MENU_ButtonsService(&browsing_menu);
+}
+
+inline static  void MENU_activateStartMenu()
+{
+	MENU_printStartMenu();
+	MENU_ButtonsService(&start_menu);
 }
 
 void MENU_startMenu_OK_Service()
 {
 	DISABLE_BUTTONS();
 	
-	//COM_sendDebugSignal();//receiving data
-	//COM_commandProcessor();// i have guarannce that data receiving will end until next line
+	COM_sendDebugSignal();//receiving data
+	COM_commandProcessor();// i have guarannce that data receiving will end until next line
+	
+	MENU_printMessage(&connected_with_device_msg);
+	_delay_ms(200);
 	
 	ENABLE_BUTTONS();
-	MENU_printNumber(70,&(MENU_Point){5 ,5 } );
+
 	MENU_activateForwardingMenu();
 }
 
@@ -85,98 +94,61 @@ void MENU_browsingData()
 	}
 }
 
-void MENU_loadNextBreakpoint()
+static struct CurrentMenu
 {
-	DISABLE_BUTTONS();
-	
-	MENU_printMessage(&updating_data_msg);
-	
-	//resetSaveBreakpoint();
-	
-	//COM_sendDebugSignal();
-	//COM_commandProcessor();//data are injected to fram now
-	//
-	//goToNextSaveBreakpoint();//so i can switch this buffer
-	
-	MENU_printForwardingMenu();
-	
-	ENABLE_BUTTONS();
+	MENU_Menu* current_menu_body;
+}current_menu;
+
+static inline void __reset_current_menu_view()
+{
+	MENU_resetMenuView(current_menu.current_menu_body);
+}
+
+static inline void __back_to_current_menu()
+{
+	MENU_printMenu(current_menu.current_menu_body);
+	MENU_ButtonsService(current_menu.current_menu_body);
+}
+
+static void GO_NEXT_action_service()
+{
+	MENU_goNextOption(current_menu.current_menu_body);
+	__back_to_current_menu();
+}
+
+static void GO_PREV_action_service()
+{
+	MENU_goPreviousOption(current_menu.current_menu_body);
+	__back_to_current_menu();
+}
+
+static void __assign_actions(option_service_t* actions)
+{
+	actions[0] = GO_NEXT_action_service;
+	actions[1] = GO_PREV_action_service;
+	actions[2] = AT_ACTIVE_OPTION(current_menu.current_menu_body).OK_action_service_;
+	actions[3] = current_menu.current_menu_body->BACK_action_service_ ;
 }
 
 void MENU_ButtonsService(MENU_Menu* const menu)
 {
+	static option_service_t actions [MENU_BUTTONS_NMBR];//current actions stored in an array
+	volatile static BUTTON_ID button_id	= NO_BUTTON_PRESSED;//the id of button which has been pressed
+	
+	//initiazilization
+	current_menu.current_menu_body	= menu;//this function argument
+	button_id						= NO_BUTTON_PRESSED;
+	
+	__assign_actions(actions);//assign current menu actions to the actions array
+	
 	ENABLE_BUTTONS();
-	MENU_resetMenuView(menu);
 
-	while(1)
-	{
-		//if(button_down(OK_BUTTON_MASK))
-		//	MENU_startMenu_OK_Service();
-			//AT_ACTIVE_OPTION(menu).OK_action_service_();
-		
-		if(button_down(RIGHT_BUTTON_MASK))
-		{
-			MENU_goNextOption(menu);
-			MENU_printMenu(menu);
-		}
-		else  if (button_down(LEFT_BUTTON_MASK))
-		{
-			MENU_goPreviousOption(menu);
-			MENU_printMenu(menu);
-		}
-		else  if (button_down(OK_BUTTON_MASK))
-		{
-			//menu->page_buffer_.pages_[0].options_[0].OK_action_service_();
-			//MENU_printNumber(get_pressed_button_code(),&(MENU_Point){5 ,5 } );
-			AT_ACTIVE_OPTION(menu).OK_action_service_();
-		}
-		else  if (button_down(BACK_BUTTON_MASK))
-		{
-			menu->BACK_action_service_();
-		}
-		else  if (button_down(SWITCH_BUTTON_MASK))
-		{
-			AT_ACTIVE_OPTION(menu).SWITCH_action_service_();
-		}
-		/*
-		switch(get_pressed_button_code())
-		{
-			
-			case RIGHT_BUTTON_MASK:
-				MENU_goNextOption(menu);
-				MENU_printMenu(menu);
-				break;
-			case LEFT_BUTTON_MASK:
-				MENU_goPreviousOption(menu);
-				MENU_printMenu(menu);
-				break;
-			case OK_BUTTON_MASK:
-				AT_ACTIVE_OPTION(menu).OK_action_service_();
-				break;
-			case BACK_BUTTON_MASK:
-				menu->BACK_action_service_();
-				break;
-			case SWITCH_BUTTON_MASK:
-				AT_ACTIVE_OPTION(menu).SWITCH_action_service_();
-				break;
-			default: 
-			//MENU_printNumber(get_pressed_button_code(),&(MENU_Point){5 ,5 } );
-			//_delay_ms(5); 
-			break;
-		}*/
-		/*
-		if(button_down(RIGHT_BUTTON_MASK))
-			MENU_goNextOption(menu);
-		else if(button_down(LEFT_BUTTON_MASK))
-			MENU_goPreviousOption(menu);
-		else if(button_down(OK_BUTTON_MASK))
-			AT_ACTIVE_OPTION(menu).OK_action_service_();
-		else if(button_down(BACK_BUTTON_MASK))
-			AT_ACTIVE_OPTION(menu).BACK_action_service_();
-		else if(button_down(SWITCH_BUTTON_MASK))
-			AT_ACTIVE_OPTION(menu).SWITCH_action_service_();
-		*/
-	}
+	while(button_id == NO_BUTTON_PRESSED)//waiting for a selection
+		button_id = get_pressed_button_id();
+	
+	DISABLE_BUTTONS();
+	
+	actions[button_id]();//invoke an certain action
 }
 
 void MENU_start()
@@ -207,11 +179,22 @@ void MENU_Browser_printHeaderBody()
 	//Paint_DrawLine(0,16,LCD_WIDTH,16,BLUE,2,LINE_STYLE_SOLID);
 }
 
-void MENU_Browser_printBottomBody()
+void MENU_loadNextBreakpoint()
 {
-	Paint_DrawLine(0,LCD_HEIGHT - 32, LCD_WIDTH, LCD_HEIGHT - 32, WHITE,2,LINE_STYLE_SOLID);
-	Paint_DrawString_EN(0,LCD_HEIGHT - 32,"Go next breakpoint",&Font16,RED,WHITE);
-	Paint_DrawString_EN(0,LCD_HEIGHT - 16,"Go next data",&Font16,BLACK,WHITE);
+	DISABLE_BUTTONS();
+	
+	MENU_printMessage(&updating_data_msg);
+	
+	resetSaveBreakpoint();
+	
+	COM_sendDebugSignal();
+	COM_commandProcessor();//data are injected to fram now
+	
+	goToNextSaveBreakpoint();//so i can switch this buffer
+	
+	ENABLE_BUTTONS();
+	
+	MENU_activateForwardingMenu();
 }
 
 //TO LECI DO DATA VIEW
@@ -273,21 +256,15 @@ void MENU_printDataPage()
 		MENU_printData(i + 1);
 }
 
-void MENU_printBrowserMenu()
-{
-	Paint_Clear(BLACK);
-	MENU_Browser_printHeaderBody();
-	for_N(i,5)
-		MENU_Browser_printDataCell(i);
-	MENU_Browser_printBottomBody();
-}
-
 void MENU_Browser_nextBreakpoint()
 {
 	DISABLE_BUTTONS();
+	
 	goToNextLoadBreakpoint();
+	
 	MENU_updateBreakpointNumber();
 	MENU_printDataPage();
+	
 	ENABLE_BUTTONS();
 }
 
@@ -318,10 +295,10 @@ void MENU_init_ForwardingMenu()
 				   (MENU_Point){ FORWARDING_MENU_X_END   , FORWARDING_MENU_Y_END   } ,
 				   (MENU_State){ FIRST_OPTION_AT_START }  );
 	
-	forwarding_menu.BACK_action_service_ = empty;
+	forwarding_menu.BACK_action_service_ = MENU_activateForwardingMenu;
 	
-	forwarding_menu.page_buffer_.pages_[0].options_[0].OK_action_service_ = &MENU_loadNextBreakpoint;//
-	forwarding_menu.page_buffer_.pages_[0].options_[1].OK_action_service_ = &MENU_activateBrowsingMenu;// MENU_loadNextBreakpoint;
+	forwarding_menu.page_buffer_.pages_[0].options_[0].OK_action_service_ = MENU_loadNextBreakpoint;//
+	forwarding_menu.page_buffer_.pages_[0].options_[1].OK_action_service_ = MENU_activateBrowsingMenu;// MENU_loadNextBreakpoint;
 	
 }
 
@@ -343,22 +320,22 @@ void MENU_init_StartMenu()
 				   (MENU_Point){ START_MENU_X_END   , START_MENU_Y_END   } ,
 				   (MENU_State){ FIRST_OPTION_AT_START }  );
 	
-	start_menu.page_buffer_.pages_[0].options_[0].OK_action_service_ = &MENU_startMenu_OK_Service;
-	start_menu.BACK_action_service_ = empty;
+	start_menu.page_buffer_.pages_[0].options_[0].OK_action_service_ = MENU_startMenu_OK_Service;
+	start_menu.BACK_action_service_ = MENU_activateStartMenu;
 }
 
 #define BROWSING_MENU_PAGES_NMBR     1
 #define BROWSING_MENU_OPTIONS_COUNT  2
 
 #define BROWSING_MENU_X_BEGIN		  0
-#define BROWSING_MENU_Y_BEGIN		  17
-#define BROWSING_MENU_X_END 		  20
+#define BROWSING_MENU_Y_BEGIN		  16
+#define BROWSING_MENU_X_END 		  21
 #define BROWSING_MENU_Y_END 		  19
 
 void MENU_init_BrowsingMenu()
 {
-	MENU_initMenu( &browsing_menu														,
-				   browsing_menu_pages													,
+	MENU_initMenu( &browsing_menu													,
+				   browsing_menu_pages												,
 				   BROWSING_MENU_PAGES_NMBR											,
 				   BROWSING_MENU_OPTIONS_COUNT										,
 				   (MENU_Point){ BROWSING_MENU_X_BEGIN , BROWSING_MENU_Y_BEGIN }	,
@@ -368,10 +345,8 @@ void MENU_init_BrowsingMenu()
 	browsing_menu.page_buffer_.pages_[0].options_[0].OK_action_service_ = empty;
 	browsing_menu.page_buffer_.pages_[0].options_[1].OK_action_service_ = empty;
 
-	browsing_menu.BACK_action_service_ = &MENU_activateForwardingMenu;
+	browsing_menu.BACK_action_service_ = MENU_activateForwardingMenu;
 }
-
-//ZRÓB BUFOR DLA GRUP MENU!!!!
 
 void MENU_Init()
 {

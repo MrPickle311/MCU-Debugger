@@ -13,6 +13,11 @@ flash_const_string_t updating_data_msg_string[] = {
 			PGM_STR("Updating data...\0")
 };
 
+flash_const_string_t connected_with_device_data_msg_string[] = {
+			PGM_STR("Connected\0") ,
+			PGM_STR("with device!\0")
+};
+
 //END MESSAGES
 
 //FORWARDING MENU

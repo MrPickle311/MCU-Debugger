@@ -18,6 +18,17 @@
 #define BACK_BUTTON_MASK	( 1<<DDD6 )
 #define SWITCH_BUTTON_MASK  ( 1<<DDD2 )
 
+#define MENU_BUTTONS_NMBR  4
+
+typedef int8_t BUTTON_ID;
+
+#define NO_BUTTON_PRESSED	-1
+
+#define RIGHT_BUTTON_ID		0
+#define LEFT_BUTTON_ID		1
+#define OK_BUTTON_ID		2
+#define BACK_BUTTON_ID		3
+
 #define BUTTON_MASK ( SWITCH_BUTTON_MASK | RIGHT_BUTTON_MASK | LEFT_BUTTON_MASK | OK_BUTTON_MASK | BACK_BUTTON_MASK )
 
 #define ENABLE_BUTTONS()	TIMER_releaseAsynchronousTimer()
@@ -30,7 +41,7 @@ extern volatile uint8_t buttons_down;
 // Return non-zero if a button matching mask is pressed.
 uint8_t button_down(uint8_t button_mask);
 
-uint8_t get_pressed_button_code();
+BUTTON_ID get_pressed_button_id();
 
 #define WAIT_FOR_BUTTON_PRESS(btn)	while(!button_down(##btn##_BUTTON_MASK))
 

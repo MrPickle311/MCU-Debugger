@@ -26,14 +26,6 @@ typedef struct MENU_Option MENU_Option;
 
 #define FIRST_OPTION_AT_START  0
 
-struct MENU_OptionRange
-{
-	uint8_t first_;
-	uint8_t last_;
-};
-
-typedef struct MENU_OptionRange MENU_OptionRange;
-
 volatile struct MENU_Point
 {
 	uint8_t x_;
@@ -41,6 +33,14 @@ volatile struct MENU_Point
 };
 
 typedef struct MENU_Point MENU_Point;
+
+volatile struct MENU_Area
+{
+	MENU_Point	begin_;
+	MENU_Point	end_;
+};
+
+typedef struct MENU_Area MENU_Area;
 
 volatile struct MENU_TextRange
 {
@@ -82,10 +82,10 @@ typedef struct MENU_PageBuffer MENU_PageBuffer;
 #define IN_PAGE_OPTIONS_COUNT(menu)		menu->page_buffer_.pages_[menu->page_buffer_.buffer_pos_].options_count_
 #define AT_ACTIVE_OPTION(menu)			AT_CURRENT_PAGE(menu).options_[menu->state_.active_option_]
 
-void MENU_PageBuffer_init(MENU_PageBuffer* buffer ,
-						  MENU_Page*	   pages  ,
-						  uint8_t		   size);
-
+void MENU_PageBuffer_init( MENU_PageBuffer* buffer ,
+						   MENU_Page*	    pages  ,
+						   uint8_t		    size);
+										   
 MENU_Page*	MENU_PageBuffer_goNext(MENU_PageBuffer* buffer);
 
 MENU_Page*	MENU_PageBuffer_goPrevious(MENU_PageBuffer* buffer);
@@ -94,8 +94,7 @@ volatile struct MENU_Menu
 {
 	MENU_PageBuffer	  page_buffer_;
 	uint8_t			  options_count_;
-	MENU_Point		  begin_;
-	MENU_Point		  end_;
+	MENU_Area		  area_;
 	MENU_State		  state_;
 	option_service_t  BACK_action_service_;
 };
@@ -113,24 +112,26 @@ volatile struct MENU_Message
 
 typedef struct MENU_Message MENU_Message;
 
-void MENU_initMenu(MENU_Menu*   menu				,
-				   MENU_Page*   pages				,
-				   uint8_t		pages_count			,
-				   uint8_t      options_count		,
-				   MENU_Point   begin				,
-				   MENU_Point   end					,
-				   MENU_State   state);
+void MENU_initMenu( MENU_Menu*   menu			,
+				    MENU_Page*   pages			,
+				    uint8_t		 pages_count	,
+				    uint8_t      options_count	,
+				    MENU_Point   begin			,
+				    MENU_Point   end			,
+				    MENU_State   state);
 
-#define MENU_TOP_Y_CELL_POS(menu)		  ( menu->begin_.y_ + 1 )
-#define MENU_BOTTOM_Y_CELL_POS(menu)	  ( menu->end_.y_   - 1 )
-#define MENU_LEFT_X_LEFT_CELL_POS(menu)   ( menu->begin_.x_ + 1 )
-#define MENU_LEFT_X_RIGHT_CELL_POS(menu)  ( menu->end_.x_   - 1 )
-#define MENU_LINES_NMBR(menu)			  ( menu->end_.y_ - menu->begin_.y_ - 1 )
-#define MENU_IN_LINE_CHARS_NMBR(menu)	  ( menu->end_.x_ - menu->begin_.x_ - 1 )
+#define AREA_TOP_Y_CELL_POS(area)		  ( area.begin_.y_ + 1 )
+#define AREA_BOTTOM_Y_CELL_POS(area)	  ( area.end_.y_   - 1 )
+#define AREA_LEFT_X_LEFT_CELL_POS(area)   ( area.begin_.x_ + 1 )
+#define AREA_LEFT_X_RIGHT_CELL_POS(area)  ( area.end_.x_   - 1 )
+#define AREA_LINES_NMBR(area)			  ( area.end_.y_   - area.begin_.y_ - 1 )
+#define AREA_IN_LINE_CHARS_NMBR(area)	  ( area.end_.x_   - area.begin_.x_ - 1 )
 
 //messages
 
-extern MENU_Message updating_data_msg;
+extern const __flash MENU_Message updating_data_msg;
+
+extern const __flash MENU_Message connected_with_device_msg;
 
 //messages END
 
