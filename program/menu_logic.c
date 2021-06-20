@@ -353,6 +353,7 @@ void MENU_Init()
 	MENU_init_StartMenu();
 	MENU_init_ForwardingMenu();
 	MENU_init_BrowsingMenu();
+	COM_initVariableBuffer();
 }
 
 //initialization END

@@ -124,7 +124,7 @@ void MENU_initMenu( MENU_Menu*   menu			,
 #define AREA_BOTTOM_Y_CELL_POS(area)	  ( area.end_.y_   - 1 )
 #define AREA_LEFT_X_LEFT_CELL_POS(area)   ( area.begin_.x_ + 1 )
 #define AREA_LEFT_X_RIGHT_CELL_POS(area)  ( area.end_.x_   - 1 )
-#define AREA_LINES_NMBR(area)			  ( area.end_.y_   - area.begin_.y_ - 1 )
+#define AREA_LINES_NMBR_AVALAIBLE(area)	  ( area.end_.y_   - area.begin_.y_ - 1 )
 #define AREA_IN_LINE_CHARS_NMBR(area)	  ( area.end_.x_   - area.begin_.x_ - 1 )
 
 //messages

@@ -39,4 +39,17 @@ void COM_configureDevice();
 
 void COM_commandProcessor();
 
+#define NAME_MAX_LENGTH		40
+
+volatile struct COM_ReceivedData
+{
+	uint32_t value_;
+	char*	 raw_name_text_;
+	uint8_t  current_text_pos = 0;
+}var_buffer;
+
+void COM_initVariableBuffer();
+
+void COM_getVariableData();
+
 #endif /* COM_H_ */

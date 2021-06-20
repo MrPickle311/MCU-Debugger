@@ -37,22 +37,24 @@ static inline void __display_value_prefix(const MENU_Point start)
 static inline void __display_var_name(const MENU_DataView* const data_view , 
 									  uint8_t					 y_start)
 {
-	uint8_t x_pos = DATA_VIEW_NAME_X_START_POS(data_view);
+	uint8_t x_pos	  = DATA_VIEW_NAME_X_START_POS(data_view);
+	uint8_t line_nmbr = 0;
 	
-	for_N( i , DATA_VIEW_AT_CURRENT_CELL(data_view).lines_count_ )
+	//for_N( i , DATA_VIEW_AT_CURRENT_CELL(data_view).lines_count_ )
+	while (var_buffer.raw_name_text_[var_buffer.current_text_pos] != '\0' )
 	{
-		if(i != 0 )	
+		if(line_nmbr != 0 )	
 			x_pos = AREA_LEFT_X_LEFT_CELL_POS(data_view->area_);
 			
-		MENU_printTextLine( DATA_VIEW_AT_CURRENT_CELL(data_view).name_lines_[i]	,
-						    &ENTIRE_LINE										,
-						    x_pos												,
-						    y_start + i											,
+		MENU_printTextLine( var_buffer.raw_name_text_	,
+						    &MENU_TextRange{ /*OKREŒLIÆ ILE ZNAKÓW WYPISAÆ!!!*/ }				,
+						    x_pos						,
+						    y_start + line_nmbr			,
 						    NOT_SELECTED);
+		
+		++line_nmbr;
 	}
 }
-
-#define NAME_MAX_LENGTH		40
 
 static void __display_var_value( const MENU_DataView* const data_view ,
 								 uint8_t					y_start)
@@ -95,5 +97,32 @@ void MENU_displayDataView(MENU_DataView* const data_view)
 						 accum);
 		accum = DATA_VIEW_AT_CURRENT_CELL(data_view).lines_count_;
 		MENU_nextCell(data_view);
+	}
+}
+
+uint8_t MENU_prepareVariabaleData( MENU_DataView* const data_view , 
+								   uint8_t		  cell_nmbr)
+{
+	uint8_t lines_filled = 0;
+	uint8_t start_x_pos  = AREA_LEFT_X_LEFT_CELL_POS(data_view->area_) ;
+	
+	if(cell_nmbr == 0)
+		start_x_pos += NAME_FIRST_LINE_OFFSET;
+	
+	
+	
+	//UZYJ TEXT_RANGE i funkcji printuj¹cej w okrojonym zasiêgu
+}
+
+void MENU_fillDataView(MENU_DataView* const data_view)
+{
+	uint8_t lines_filled = 0;
+	data_view->current_cell_to_display_ = 0;
+	
+	while( lines_filled <= AREA_LINES_NMBR_AVALAIBLE(current_data_view.area_) )
+	{
+		COM_getVariableData();
+		lines_filled += MENU_prepareVariabaleData(MENU_prepareVariabaleData);
+		++data_view->current_cell_to_display_; 
 	}
 }

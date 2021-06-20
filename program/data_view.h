@@ -21,11 +21,11 @@ volatile struct MENU_DataCell
 
 typedef struct MENU_DataCell MENU_DataCell;
 
-#define MAX_SCREEN_CAPACITY 6 //max count of cells screen can display
+#define IN_CELLS_SCREEN_MAX_CAPACITY 6 //max count of cells screen can display
 
 volatile struct MENU_DataView
 {
-	MENU_DataCell cells_ [MAX_SCREEN_CAPACITY];
+	MENU_DataCell cells_ [IN_CELLS_SCREEN_MAX_CAPACITY];
 	uint8_t		  cells_count_to_display_;
 	uint8_t		  current_cell_to_display_;
 	MENU_Area	  area_;
@@ -47,5 +47,10 @@ void MENU_displayCell( const MENU_DataView* const data_view ,
 					   uint8_t					  y_start);
 
 void MENU_displayDataView(MENU_DataView* const data_view);
+
+uint8_t MENU_prepareVariabaleData(uint8_t cell_nmbr);//it prepares data to been able to be shown
+
+void MENU_fillDataView(MENU_DataView* const data_view);
+
 
 #endif /* DATA_VIEW_H_ */

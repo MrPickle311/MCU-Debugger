@@ -7,7 +7,7 @@
 
 #include "com.h"
 
-void COM_sendDebugSignal()
+void COM_sendDebugSignal()//it sets a low  state for a 2 ms -> request for a new breakpoint
 {
 	PORT_setPinLow(PORT_STATE(E),2);
 	_delay_ms(2);
@@ -77,5 +77,47 @@ void COM_commandProcessor()
 			}
 		}
 	}
+}
+
+void COM_initVariableBuffer()
+{
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+	{
+		var_buffer.raw_name_text_ = calloc(NAME_MAX_LENGTH, sizeof(char) );
+		var_buffer.value_		  = 0;
+		var_buffer.current_text_pos  = 0;
+	}
+}
+
+void COM_getVariableData()
+{
+	static uint8_t  sb_idx		= 0;
+	static uint8_t  var_size	= 0;
+	static uint8_t  helper_var	= 0;
+	
+	//reset local
+	sb_idx		= 0;
+	var_size	= 0;
+	helper_var	= 0;
+	
+	//reset var buffer
+	var_buffer.value_			 = 0;
+	var_buffer.raw_name_text_[0] = '\0';
+	var_buffer.current_text_pos  = 0;
+	
+	FRAM_CircularBuffer_pop(fram_buffer,&var_size);//get var size
+	
+	//value collecting
+	for_N(i,var_size)
+	{
+		FRAM_CircularBuffer_pop(fram_buffer,&helper_var);
+		var_buffer.value_ |= helper_var << ( 8 * i ) ;//8-bit , 16-bit ...
+	}
+	
+	FRAM_CircularBuffer_pop(fram_buffer,&var_buffer.raw_name_text_[sb_idx]);//get first char of the var name
+	
+	//the rest of the name
+	while(var_buffer.raw_name_text_[sb_idx++])
+		FRAM_CircularBuffer_pop(fram_buffer,&var_buffer.raw_name_text_[sb_idx]);
 }
 
