@@ -22,6 +22,8 @@ extern flash_const_string_t updating_data_msg_string[];
 
 extern flash_const_string_t connected_with_device_data_msg_string[];
 
+extern flash_const_string_t data_buffer_empty_msg_string[];
+
 //END MESSAGES
 
 //FORWARDING MENU

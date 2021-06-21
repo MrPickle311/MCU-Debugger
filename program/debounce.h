@@ -6,19 +6,21 @@
 #include <util/atomic.h>
 #include "../drivers/core/timer.h"
 #include "../drivers/core/bit_utils.h"
+#include "../drivers/core/bit_utils.h"
 
 // Buttons connected to port D
 #define BUTTON_PORT PORTD
 #define BUTTON_PIN PIND
 #define BUTTON_DDR DDRD
 
-#define RIGHT_BUTTON_MASK	( 1<<DDD3 )
-#define LEFT_BUTTON_MASK	( 1<<DDD4 )
-#define OK_BUTTON_MASK		( 1<<DDD5 )
-#define BACK_BUTTON_MASK	( 1<<DDD6 )
-#define SWITCH_BUTTON_MASK  ( 1<<DDD2 )
 
-#define MENU_BUTTONS_NMBR  4
+#define RIGHT_BUTTON_MASK	( BIT_MASK_OF(DDD3) )
+#define LEFT_BUTTON_MASK	( BIT_MASK_OF(DDD4) )
+#define OK_BUTTON_MASK		( BIT_MASK_OF(DDD5) )
+#define BACK_BUTTON_MASK	( BIT_MASK_OF(DDD6) )
+#define SWITCH_BUTTON_MASK  ( BIT_MASK_OF(DDD2) )
+
+#define MENU_BUTTONS_COUNT  4
 
 typedef int8_t BUTTON_ID;
 

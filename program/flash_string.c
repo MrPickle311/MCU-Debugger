@@ -18,6 +18,10 @@ flash_const_string_t connected_with_device_data_msg_string[] = {
 			PGM_STR("with device!\0")
 };
 
+flash_const_string_t data_buffer_empty_msg_string[] = {
+			PGM_STR("Empty\0")
+};
+
 //END MESSAGES
 
 //FORWARDING MENU

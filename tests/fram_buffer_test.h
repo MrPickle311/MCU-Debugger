@@ -11,7 +11,7 @@
 
 #include "../drivers/fram/fram_circular_buffer.h"
 #include "../drivers/lcd/GUI_Paint.h"
-#include "../program/settings.h"
+#include "../program/core.h"
 
 void injectTXT(FRAM_CircularBuffer bf, char* txt)
 {
@@ -78,7 +78,7 @@ void fram_test2()
 	uint8_t var3 = 43;
 	char var3name[] = {"var3\0"};
 		
-	configureDebuggerFRAM(4);
+	CORE_configureDebuggerFRAM(4);
 	
 	FRAM_CircularBuffer_safePush(fram_buffer,var1);
 	injectTXT(fram_buffer,var1name);
@@ -86,12 +86,12 @@ void fram_test2()
 	FRAM_CircularBuffer_safePush(fram_buffer,varp);
 	injectTXT(fram_buffer,varpname);
 	
-	goToNextSaveBreakpoint();
+	CORE_goToNextSaveBreakpoint();
 	
 	FRAM_CircularBuffer_safePush(fram_buffer,var2);
 	injectTXT(fram_buffer,var2name);
 	
-	goToNextSaveBreakpoint();
+	CORE_goToNextSaveBreakpoint();
 	
 	FRAM_CircularBuffer_safePush(fram_buffer,var3);
 	injectTXT(fram_buffer,var3name);
@@ -179,7 +179,7 @@ void fram_test4()
 	char temp[20];
 	uint8_t tmp = 0;
 	
-	configureDebuggerFRAM(4);
+	CORE_configureDebuggerFRAM(4);
 	
 	FRAM_CircularBuffer_safePush(fram_buffer,var1);
 	injectTXT(fram_buffer,var1name);
@@ -187,7 +187,7 @@ void fram_test4()
 	injectTXT(fram_buffer,varpname);
 	
 	
-	resetLoadBreakpoint();
+	CORE_resetLoadBreakpoint();
 	for_N(i,6)
 	{
 		FRAM_CircularBuffer_pop(fram_buffer,&tmp);
@@ -195,14 +195,14 @@ void fram_test4()
 	}
 	
 	
-	goToNextSaveBreakpoint();
+	CORE_goToNextSaveBreakpoint();
 	sprintf(temp,"brk save :%d",current_breakpoint_to_save);
 	Paint_DrawString_EN(70,100,temp,&Font16,BLACK,WHITE);
 	FRAM_CircularBuffer_safePush(fram_buffer,var2);
 	injectTXT(fram_buffer,var2name);
 	UPDATE_SAVE_POS();
 	
-	goToNextLoadBreakpoint();
+	CORE_goToNextLoadBreakpoint();
 	sprintf(temp,"brk:%d",current_breakpoint_to_load);
 	Paint_DrawString_EN(6,100,temp,&Font16,BLACK,WHITE);
 	for_N(i,6)
@@ -212,12 +212,12 @@ void fram_test4()
 	}
 	
 	
-	goToNextSaveBreakpoint();
+	CORE_goToNextSaveBreakpoint();
 	FRAM_CircularBuffer_safePush(fram_buffer,var3);
 	injectTXT(fram_buffer,var3name);
 	
 	
-	resetLoadBreakpoint();
+	CORE_resetLoadBreakpoint();
 	sprintf(temp,"brk:%d",current_breakpoint_to_load);
 	Paint_DrawString_EN(6,228,temp,&Font16,BLACK,WHITE);
 	for_N(i,6)

@@ -86,85 +86,8 @@ void MENU_printMessage(const MENU_Message __memx* const msg)
 						    msg->begin_.x_     ,
 						    msg->begin_.y_ + i ,
 						    NOT_SELECTED);
+	_delay_ms(300);
 }
-
-/*
-
-#define PLACE_FOR_SCROLLBAR 8
-#define SCROLLBAR_OFFSET	6
-
-static inline void __print_scrollbar_line(uint8_t start_y    , 
-										  uint8_t end_y      ,
-										  uint8_t x          ,
-										  uint8_t width)
-{
-	Paint_DrawLine( x		, 
-				    start_y	, 
-				    x		,
-					end_y	, 
-				    RED		, 
-				    width	, 
-				    LINE_STYLE_SOLID);
-}
-*/
-
-/*
-#define THIN_LINE_WIDTH  2
-#define THICK_LINE_WIDTH 4
-
-
-
-static void __print_Scrollbar(const MENU_Menu * const menu)
-{
-	//a thin line
-	__print_scrollbar_line( MENU_TOP_Y_CELL_POS(menu) * FONT_16_HEIGHT       ,
-							menu->end_.y_ * FONT_16_HEIGHT				     , 
-						    menu->end_.x_ * FONT_16_WIDTH + SCROLLBAR_OFFSET , 
-						    THIN_LINE_WIDTH);
-	//a thick line
-	//POKOMBINUJ TAK: START = DLUGOSC CALEGO SUWAKA * ( OBECNA POZYCJA / ILOSC STRON )
-	// END = START + DLUGOSC CALEGO SUWAKA * ( 1 / ILOSC STRON )
-	uint8_t start = (uint8_t)( MENU_LINES_NMBR(menu) * (float)( menu->page_buffer_.buffer_pos_ / menu->page_buffer_.buffer_size_ ) ) * FONT_16_HEIGHT;
-	__print_scrollbar_line(  start,
-							( menu->end_.y_  ) * FONT_16_HEIGHT				     , 
-						     menu->end_.x_ * FONT_16_WIDTH + SCROLLBAR_OFFSET    , 
-						     THICK_LINE_WIDTH);
-}
-
-*/
-
-/*
-
-static inline uint8_t __determine_start_option(const MENU_Menu * const menu, const DIRECTION direction)
-{
-	if(direction == DOWN)
-		return menu->state_.displayed_range_.last_ + 1;
-	else return menu->state_.displayed_range_.first_ - 1;
-}
-
-static inline uint8_t __get_options_nmbr(const MENU_Menu * const menu, const DIRECTION direction)
-{
-	uint8_t available_lines   =  MENU_LINES_NMBR(menu);
-	uint8_t accumulated_lines = 0;
-	uint8_t options_to_print  = 0;
-	uint8_t current_option    = __determine_start_option(menu, direction);
-	
-	while(1)
-	{
-		if(current_option == 0 || current_option == menu->options_count_ - 1)
-			break;
-		
-		accumulated_lines += menu->options_[current_option + direction * options_to_print ].lines_nmbr_;
-		
-		if(accumulated_lines > available_lines)
-			break;
-		++options_to_print;
-	}
-	
-	return options_to_print;
-}
-
-*/
 
 static inline void __print_option( const MENU_Menu * const menu , 
 								   const MENU_Option* const opt , 
@@ -199,16 +122,6 @@ static inline void __print_page( const MENU_Menu* const menu )
 	}
 }
 
-/*
-static inline void __update_State( MENU_Menu * const menu            , 
-								   const DIRECTION   direction       , 
-								   const uint8_t     options_printed   )
-{
-	menu->state_.displayed_range_.first_ += direction * options_printed; 
-	menu->state_.displayed_range_.last_ += direction * options_printed; 
-}
-*/
-
 void MENU_clearArea(const MENU_Area * const area)
 {
 	Paint_ClearWindows( AREA_LEFT_X_LEFT_CELL_POS((*area))  * FONT_16_WIDTH   ,
@@ -233,17 +146,17 @@ static inline void __update_Text(MENU_Menu * const menu , const DIRECTION direct
 
 #define FRAME_LEFTSIDE_OFFSET 2
 
-static void __draw_Frame(const MENU_Menu * const menu)
+void MENU_drawFrame(const MENU_Area* const area)
 {
-	MENU_drawRectangle( menu->area_.begin_.x_ * FONT_16_WIDTH  + (uint8_t)( FONT_16_WIDTH / 2 ) + FRAME_LEFTSIDE_OFFSET ,
-					    menu->area_.begin_.y_ * FONT_16_HEIGHT + FONT_16_HEIGHT / 2										, 
-						menu->area_.end_.x_   * FONT_16_WIDTH  + (uint8_t)( FONT_16_WIDTH / 2 )							,
-						menu->area_.end_.y_   * FONT_16_HEIGHT + FONT_16_HEIGHT / 2 );
+	MENU_drawRectangle( area->begin_.x_ * FONT_16_WIDTH  + (uint8_t)( FONT_16_WIDTH / 2 ) + FRAME_LEFTSIDE_OFFSET ,
+					    area->begin_.y_ * FONT_16_HEIGHT + FONT_16_HEIGHT / 2									  , 
+						area->end_.x_   * FONT_16_WIDTH  + (uint8_t)( FONT_16_WIDTH / 2 )						  ,
+						area->end_.y_   * FONT_16_HEIGHT + FONT_16_HEIGHT / 2 );
 }
 
 void MENU_printMenu(const MENU_Menu * const menu)
 {
-	__draw_Frame(menu);
+	MENU_drawFrame(&menu->area_);
 	__print_page(menu);
 }
 
@@ -264,9 +177,11 @@ void MENU_goNextOption(MENU_Menu * const menu)
 	++menu->state_.active_option_;
 }
 
+#define FIRST_OPTION 0
+
 void MENU_goPreviousOption(MENU_Menu * const menu)
 {
-	if(menu->state_.active_option_  == 0)
+	if(menu->state_.active_option_  == FIRST_OPTION)
 	{
 		MENU_PageBuffer_goPrevious(menu);
 		menu->state_.active_option_ = AT_CURRENT_PAGE(menu).options_count_ - 1;

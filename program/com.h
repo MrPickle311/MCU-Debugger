@@ -12,7 +12,7 @@
 #include "../drivers/core/twi_slave.h"
 #include "../drivers/fram/fram.h"
 #include "../drivers/core/port.h"
-#include "settings.h"
+#include "core.h"
 #include <util/delay.h>
 #include <stdbool.h>
 #include "debounce.h"
@@ -28,7 +28,6 @@ enum Command
 {
 	DEVICE_START	   = 0x80,
 	SENDING_VARIABLE   = 0x81,
-	SENDING_ARRAY	   = 0x82,
 	NAME_SENT          = 0x8C,
 	END_TRANSACTION    = 0xFF
 };
@@ -45,8 +44,12 @@ volatile struct COM_ReceivedData
 {
 	uint32_t value_;
 	char*	 raw_name_text_;
-	uint8_t  current_text_pos = 0;
+	uint8_t  current_text_pos_;
+	bool	 is_empty_;
 }var_buffer;
+
+#define VAR_BUF_AT_CURRENT_CHAR(var_buffer)	var_buffer.raw_name_text_[var_buffer.current_text_pos_]
+
 
 void COM_initVariableBuffer();
 

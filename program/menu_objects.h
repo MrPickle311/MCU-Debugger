@@ -50,6 +50,10 @@ volatile struct MENU_TextRange
 
 typedef struct MENU_TextRange MENU_TextRange;
 
+#define FIRST_X_CELL			0
+#define LCD_IN_CELLS_WIDTH		21
+#define LCD_IN_CELLS_HEIGHT		20
+
 volatile const MENU_TextRange ENTIRE_LINE;
 
 struct MENU_State
@@ -127,11 +131,16 @@ void MENU_initMenu( MENU_Menu*   menu			,
 #define AREA_LINES_NMBR_AVALAIBLE(area)	  ( area.end_.y_   - area.begin_.y_ - 1 )
 #define AREA_IN_LINE_CHARS_NMBR(area)	  ( area.end_.x_   - area.begin_.x_ - 1 )
 
+//STATIC GLOBAL DATA
+//////////////////////////////////////////////////////////////////////////
+
 //messages
 
 extern const __flash MENU_Message updating_data_msg;
 
 extern const __flash MENU_Message connected_with_device_msg;
+
+extern const __flash MENU_Message data_buffer_empty_msg;
 
 //messages END
 

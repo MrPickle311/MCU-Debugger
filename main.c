@@ -75,30 +75,31 @@ void wipeFRAM()
 		FRAM_writeSingleByte(0,i);
 }
 
-
-
 int main(void)
 {
 	configurePORTS();
-	
 	configureTWISlave();
 	configureTWIMaster();
 	configureLCD();
 	configureDebouncingTimer();
-	debounce_init();
 	
+	//for(uint8_t i= 0 ; i < 20 ; ++i)
+	//	MENU_printTextLine(PSTR("XXXXXXXXXXXXXXXXXXXX"), &ENTIRE_LINE , 0 ,i , NOT_SELECTED);
+	//
+	//for(uint8_t i= 0 ; i < 20 ; ++i)
+	//	MENU_printTextLine(PSTR("                    "), &ENTIRE_LINE , 0 ,i , NOT_SELECTED);
+	
+	//MENU_clearArea(&(MENU_Area){ (MENU_Point){0,0}, (MENU_Point){19, 19} });
 	_delay_ms(300);
 	sei();
-	MENU_Init();
-	MENU_start();
+	
+	
+	MENU_startApplication();
 	
 	//fram_test1();
 	//fram_test2();
 	//fram_test3();
 	//fram_test4();
-    while (1)
-	{
-		//MENU_navigate();
-	}
+    while (1);
 }
 

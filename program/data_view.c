@@ -7,14 +7,8 @@
 
 #include "data_view.h"
 
-void MENU_nextCell(MENU_DataView* const data_view)
-{
-	data_view->current_cell_to_display_ = ( data_view->current_cell_to_display_  + 1 )  %  
-											data_view->cells_count_to_display_;
-}
-
-static inline void __display_prefix(const char __memx* prefix_txt , 
-									const MENU_Point   start)
+static inline void __display_prefix( const char __memx* prefix_txt , 
+									 const MENU_Point   start)
 {
 	MENU_printTextLine( prefix_txt	 ,
 						&ENTIRE_LINE ,
@@ -34,26 +28,39 @@ static inline void __display_value_prefix(const MENU_Point start)
 	__display_prefix( PSTR("Value:\0") , start);
 }
 
-static inline void __display_var_name(const MENU_DataView* const data_view , 
-									  uint8_t					 y_start)
+static inline uint8_t __display_var_name( const MENU_DataView* const data_view , 
+										  uint8_t					 y_start)
 {
-	uint8_t x_pos	  = DATA_VIEW_NAME_X_START_POS(data_view);
-	uint8_t line_nmbr = 0;
+	uint8_t x_pos				= DATA_VIEW_NAME_X_START_POS(data_view);
+	uint8_t current_line_nmbr	= 0;
+	bool	printing_is_done	= false;
 	
-	//for_N( i , DATA_VIEW_AT_CURRENT_CELL(data_view).lines_count_ )
-	while (var_buffer.raw_name_text_[var_buffer.current_text_pos] != '\0' )
+	__display_name_prefix( (MENU_Point){ AREA_LEFT_X_LEFT_CELL_POS(data_view->area_) , 
+										 y_start  } );
+	
+	while ( !printing_is_done )
 	{
-		if(line_nmbr != 0 )	
-			x_pos = AREA_LEFT_X_LEFT_CELL_POS(data_view->area_);
-			
-		MENU_printTextLine( var_buffer.raw_name_text_	,
-						    &MENU_TextRange{ /*OKREŒLIÆ ILE ZNAKÓW WYPISAÆ!!!*/ }				,
-						    x_pos						,
-						    y_start + line_nmbr			,
+		while( x_pos != data_view->area_.end_.x_ )
+		{
+			MENU_printChar( VAR_BUF_AT_CURRENT_CHAR(var_buffer)				     ,
+						    &(MENU_Point){ x_pos , y_start + current_line_nmbr } ,
 						    NOT_SELECTED);
+			
+			++x_pos;
+			++var_buffer.current_text_pos_;
+			
+			if(VAR_BUF_AT_CURRENT_CHAR(var_buffer) == '\0')
+			{
+				printing_is_done = true;
+				break;
+			}
+		}
 		
-		++line_nmbr;
+		++current_line_nmbr;
+		x_pos	= AREA_LEFT_X_LEFT_CELL_POS(data_view->area_);
 	}
+	
+	return current_line_nmbr + 1;
 }
 
 static void __display_var_value( const MENU_DataView* const data_view ,
@@ -61,9 +68,12 @@ static void __display_var_value( const MENU_DataView* const data_view ,
 {
 	static char	number_str_buffer[NAME_MAX_LENGTH];
 	
-	sprintf( number_str_buffer								, 
-			 "0x%08x"										,  
-			 DATA_VIEW_AT_CURRENT_CELL(data_view).value_ );
+	__display_value_prefix( (MENU_Point){ AREA_LEFT_X_LEFT_CELL_POS(data_view->area_) , 
+							y_start  } );
+	
+	sprintf( number_str_buffer	 , 
+			 "0x%08x"			 ,  
+			 var_buffer.value_ );
 	
 	MENU_printTextLine( number_str_buffer						,
 						&ENTIRE_LINE							,
@@ -72,57 +82,35 @@ static void __display_var_value( const MENU_DataView* const data_view ,
 						NOT_SELECTED);
 }
 
-void MENU_displayCell( const MENU_DataView* const data_view ,
-					   uint8_t					  y_shift)
+#define TWO_LINES 2
+
+void MENU_refreshDataView(MENU_DataView* const data_view)
 {
-	__display_var_name( data_view ,
-						AREA_TOP_Y_CELL_POS(data_view->area_)	+ 
-						y_shift );
+	uint8_t lines_filled = 0;
 	
-	__display_var_value( data_view									, 
-						 AREA_TOP_Y_CELL_POS(data_view->area_)	+
-						 y_shift								+ 
-						 DATA_VIEW_AT_CURRENT_CELL(data_view).lines_count_);
+	MENU_clearArea(&data_view->area_);
+	
+	while( lines_filled + TWO_LINES <= AREA_LINES_NMBR_AVALAIBLE(current_data_view.area_) )
+	{
+		COM_getVariableData();
+		lines_filled += __display_var_name(data_view, lines_filled + 
+													  AREA_TOP_Y_CELL_POS(data_view->area_));
+		__display_var_value(data_view, lines_filled );
+		++lines_filled;//a line for a value
+	}
+	
 }
 
 void MENU_displayDataView(MENU_DataView* const data_view)
 {
-	uint8_t accum = 0;
-	
-	MENU_clearArea(&data_view->area_);
-	
-	for_N(i , data_view->cells_count_to_display_)
-	{
-		MENU_displayCell(data_view , 
-						 accum);
-		accum = DATA_VIEW_AT_CURRENT_CELL(data_view).lines_count_;
-		MENU_nextCell(data_view);
-	}
+	MENU_drawFrame(&data_view->area_);
+	MENU_refreshDataView(data_view);
 }
 
-uint8_t MENU_prepareVariabaleData( MENU_DataView* const data_view , 
-								   uint8_t		  cell_nmbr)
+void MENU_initDataView( MENU_DataView* const data_view ,
+					    MENU_Point   begin			   ,
+					    MENU_Point   end			)
 {
-	uint8_t lines_filled = 0;
-	uint8_t start_x_pos  = AREA_LEFT_X_LEFT_CELL_POS(data_view->area_) ;
-	
-	if(cell_nmbr == 0)
-		start_x_pos += NAME_FIRST_LINE_OFFSET;
-	
-	
-	
-	//UZYJ TEXT_RANGE i funkcji printuj¹cej w okrojonym zasiêgu
-}
-
-void MENU_fillDataView(MENU_DataView* const data_view)
-{
-	uint8_t lines_filled = 0;
-	data_view->current_cell_to_display_ = 0;
-	
-	while( lines_filled <= AREA_LINES_NMBR_AVALAIBLE(current_data_view.area_) )
-	{
-		COM_getVariableData();
-		lines_filled += MENU_prepareVariabaleData(MENU_prepareVariabaleData);
-		++data_view->current_cell_to_display_; 
-	}
-}
+	data_view->area_.begin_ = begin;
+	data_view->area_.end_   = end;
+ }

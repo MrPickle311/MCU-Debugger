@@ -31,14 +31,14 @@ volatile uint16_t* current_fram_push_positions;
 
 #define UPDATE_SAVE_POS()	current_fram_push_positions[current_breakpoint_to_save] = FRAM_CircularBuffer_getFillLevel(fram_buffer)
 
-void resetLoadBreakpoint();
+void CORE_resetLoadBreakpoint();
 
-void resetSaveBreakpoint();
+void CORE_resetSaveBreakpoint();
 
-void goToNextSaveBreakpoint();
+void CORE_goToNextSaveBreakpoint();
 
-void goToNextLoadBreakpoint();
+void CORE_goToNextLoadBreakpoint();
 
-void configureDebuggerFRAM(uint16_t breakpoints_nmbr);
+void CORE_configureDebuggerFRAM(uint16_t breakpoints_nmbr);
 
 #endif /* SETTINGS_H_ */

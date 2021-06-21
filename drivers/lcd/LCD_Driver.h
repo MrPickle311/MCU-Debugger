@@ -80,4 +80,8 @@ void LCD_ClearWindow(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend,UWORD co
 		\
 		LCD_Write_Command(0x2C)
 
+#define LCD_DRAW(x , y , Color)\
+	LCD_SetCursor(x, y);\
+	LCD_WriteData_Word(Color);
+
 #endif

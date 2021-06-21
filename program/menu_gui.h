@@ -49,9 +49,11 @@ void MENU_wipeAll();
 
 void MENU_printMessage(const MENU_Message __memx* const msg);
 
-void MENU_clearArea(const MENU_Area * const area);
+void MENU_clearArea(const MENU_Area* const area);
 
-void MENU_printMenu(const MENU_Menu * const menu);
+void MENU_drawFrame(const MENU_Area* const area);
+
+void MENU_printMenu(const MENU_Menu* const menu);
 
 void MENU_updateCurrentPage( const MENU_Menu * const menu , 
 							 const DIRECTION direction);

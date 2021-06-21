@@ -166,6 +166,14 @@ void Paint_SetPixel(UWORD Xpoint, UWORD Ypoint, UWORD Color)
   LCD_DrawPaint(X, Y, Color);
 }
 
+//more optimized version for some specific situtions
+#define SET_PIXEL(Xpoint, Ypoint, Color)\
+	if (Xpoint > Paint.Width || Ypoint > Paint.Height)\
+		return;\
+	if (X > Paint.WidthMemory || Y > Paint.HeightMemory)\
+		return;\
+	LCD_DRAW(Xpoint, Ypoint, Color)
+
 /******************************************************************************
   function: Clear the color of the picture
   parameter:
@@ -194,7 +202,8 @@ void Paint_ClearWindows(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend, UWOR
   UWORD X, Y;
   for (Y = Ystart; Y < Yend; Y++) {
     for (X = Xstart; X < Xend; X++) {//8 pixel =  1 byte
-      Paint_SetPixel(X, Y, Color);
+      //Paint_SetPixel(X, Y, Color);
+	  SET_PIXEL(X, Y , Color);
     }
   }
 }
