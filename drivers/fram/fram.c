@@ -7,6 +7,8 @@
 
 #include "fram.h"
 
+//GPIOR0
+
 volatile byte_t __fram_local_buffer__ = 0; //zamien na GPIOR
 
 void FRAM_writeSingleByte(byte_t byte, large_length_t address)
@@ -64,7 +66,7 @@ void FRAM_readByteSequence(byte_t* target,length_t size,large_length_t start_add
 	}
 }
 
-void FRAM_readText(char* target,large_length_t start_address)
+void FRAM_readText(char* target , large_length_t start_address)
 {
 	uint8_t array_idx = 0;
 	target[array_idx] = (char)FRAM_readRandomByte(start_address);

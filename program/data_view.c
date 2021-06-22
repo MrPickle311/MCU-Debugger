@@ -42,6 +42,12 @@ static inline uint8_t __display_var_name( const MENU_DataView* const data_view ,
 	{
 		while( x_pos != data_view->area_.end_.x_ )
 		{
+			if(VAR_BUF_AT_CURRENT_CHAR(var_buffer) == '\0')
+			{
+				printing_is_done = true;
+				break;
+			}
+			
 			MENU_printChar( VAR_BUF_AT_CURRENT_CHAR(var_buffer)				     ,
 						    &(MENU_Point){ x_pos , y_start + current_line_nmbr } ,
 						    NOT_SELECTED);
@@ -49,11 +55,6 @@ static inline uint8_t __display_var_name( const MENU_DataView* const data_view ,
 			++x_pos;
 			++var_buffer.current_text_pos_;
 			
-			if(VAR_BUF_AT_CURRENT_CHAR(var_buffer) == '\0')
-			{
-				printing_is_done = true;
-				break;
-			}
 		}
 		
 		++current_line_nmbr;
@@ -82,6 +83,18 @@ static void __display_var_value( const MENU_DataView* const data_view ,
 						NOT_SELECTED);
 }
 
+static inline bool __is_empty_breakpoint(uint8_t brkp_nmbr)
+{
+	return brkp_nmbr > var_buffer.breakpoints_loaded_;
+}
+
+static inline void __mask_received_data()
+{
+	var_buffer.current_text_pos_ = 0;
+	var_buffer.raw_name_text_[0] = '\0';
+	var_buffer.value_ = 0;
+}
+
 #define TWO_LINES 2
 
 void MENU_refreshDataView(MENU_DataView* const data_view)
@@ -92,7 +105,11 @@ void MENU_refreshDataView(MENU_DataView* const data_view)
 	
 	while( lines_filled + TWO_LINES <= AREA_LINES_NMBR_AVALAIBLE(current_data_view.area_) )
 	{
-		COM_getVariableData();
+		
+		if(__is_empty_breakpoint(current_breakpoint_to_load))
+			__mask_received_data();
+		else COM_getVariableData();
+		
 		lines_filled += __display_var_name(data_view, lines_filled + 
 													  AREA_TOP_Y_CELL_POS(data_view->area_));
 		__display_var_value(data_view, lines_filled );
@@ -101,7 +118,7 @@ void MENU_refreshDataView(MENU_DataView* const data_view)
 	
 }
 
-void MENU_displayDataView(MENU_DataView* const data_view)
+void MENU_displayDataView(volatile MENU_DataView* const data_view)
 {
 	MENU_drawFrame(&data_view->area_);
 	MENU_refreshDataView(data_view);

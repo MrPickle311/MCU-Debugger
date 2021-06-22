@@ -2,7 +2,7 @@
  * ext_twi.h
  *
  * Created: 07/05/2021 23:37:48
- *  Author: Damian
+ *  Author: Damian Wójcik
  */ 
 
 

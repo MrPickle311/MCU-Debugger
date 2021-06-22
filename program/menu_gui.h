@@ -20,7 +20,7 @@
 #define UP   -1
 #define DOWN  1
 
-typedef uint8_t DIRECTION;
+typedef int8_t DIRECTION;
 
 #define NOT_SELECTED		   BLACK
 #define SELECTED			   RED

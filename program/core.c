@@ -7,7 +7,9 @@
 
 #include "core.h"
 
-volatile uint8_t breakpoints_total_nmbr = 1;
+#define DEFAULT_BRKP_COUNT 1
+
+volatile uint8_t breakpoints_total_nmbr = DEFAULT_BRKP_COUNT;
 
 volatile uint8_t current_breakpoint_to_save = 0;
 

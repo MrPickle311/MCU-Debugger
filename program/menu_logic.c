@@ -32,6 +32,12 @@ static inline void __browser_print_header_body()
 	__update_brakpoint_nmbr();
 }
 
+static inline void __update_loaded_breakpoints_nmbr()
+{
+	if(var_buffer.breakpoints_loaded_ < breakpoints_total_nmbr)
+		++var_buffer.breakpoints_loaded_;
+}
+
 void MENU_loadNextBreakpoint()
 {
 	DISABLE_BUTTONS();
@@ -45,7 +51,8 @@ void MENU_loadNextBreakpoint()
 	
 	CORE_goToNextSaveBreakpoint();//so i can switch this buffer
 	
-	var_buffer.is_empty_ = false;
+	__update_loaded_breakpoints_nmbr();
+	
 	ENABLE_BUTTONS();
 	
 	MENU_activateForwardingMenu();
@@ -97,7 +104,7 @@ void MENU_activateForwardingMenu()
 
 void MENU_activateBrowsingMenu()
 {
-	if(var_buffer.is_empty_)
+	if(var_buffer.breakpoints_loaded_ == 0)
 	{
 		MENU_printMessage(&data_buffer_empty_msg);
 		MENU_activateForwardingMenu();
@@ -158,7 +165,7 @@ static inline void __assign_actions(option_service_t* actions)
 void MENU_ButtonsService(MENU_Menu* const menu)
 {
 	static option_service_t actions [MENU_BUTTONS_COUNT];//current actions stored in an array
-	volatile static BUTTON_ID button_id	= NO_BUTTON_PRESSED;//the id of button which has been pressed
+	static BUTTON_ID button_id	= NO_BUTTON_PRESSED;//the id of button which has been pressed
 	
 	//initiazilization
 	current_menu.current_menu_body	= menu;//this function argument

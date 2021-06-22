@@ -30,7 +30,7 @@ void MENU_displayCell( const MENU_DataView* const data_view ,
 
 void MENU_refreshDataView( MENU_DataView* const data_view);
 
-void MENU_displayDataView( MENU_DataView* const data_view);
+void MENU_displayDataView(volatile MENU_DataView* const data_view);
 
 void MENU_initDataView( MENU_DataView* const data_view ,
 					    MENU_Point   begin			   ,

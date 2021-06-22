@@ -78,13 +78,7 @@ void initTimer1();
  * SPI
 **/
 
-#define SPI0_quickSend(byte)\
-	SPI0_sendByte(byte);\
-	SPI0_waitForTransmitionCompleted()
-	//SPI0_receiveByte()
-
-#define DEV_SPI_WRITE(_dat)   SPI0_quickSend(_dat)
-// SPI0_exchangeByte(_dat)
+#define DEV_SPI_WRITE(_dat)   SPI0_exchangeByte(_dat)
 
 /**
  * delay x ms

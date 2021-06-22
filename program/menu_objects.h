@@ -14,7 +14,7 @@
 
 typedef void (*option_service_t)();
 
-volatile struct MENU_Option
+struct MENU_Option
 {
 	flash_string_array_t str_lines_;
 	uint8_t				 lines_nmbr_;
@@ -26,7 +26,7 @@ typedef struct MENU_Option MENU_Option;
 
 #define FIRST_OPTION_AT_START  0
 
-volatile struct MENU_Point
+struct MENU_Point
 {
 	uint8_t x_;
 	uint8_t y_;
@@ -34,7 +34,7 @@ volatile struct MENU_Point
 
 typedef struct MENU_Point MENU_Point;
 
-volatile struct MENU_Area
+struct MENU_Area
 {
 	MENU_Point	begin_;
 	MENU_Point	end_;
@@ -42,7 +42,7 @@ volatile struct MENU_Area
 
 typedef struct MENU_Area MENU_Area;
 
-volatile struct MENU_TextRange
+struct MENU_TextRange
 {
 	uint8_t x_start_;
 	uint8_t x_end_;
@@ -63,7 +63,7 @@ struct MENU_State
 
 typedef struct MENU_State MENU_State;
 
-volatile struct MENU_Page
+struct MENU_Page
 {
 	MENU_Option* options_;
 	uint8_t		 options_count_;
@@ -73,7 +73,7 @@ typedef struct MENU_Page MENU_Page;
 
 void MENU_Page_init(MENU_Page* page, MENU_Option* options, uint8_t options_count);
 
-volatile struct MENU_PageBuffer
+struct MENU_PageBuffer
 {
 	MENU_Page* pages_;
 	uint8_t    buffer_size_;
@@ -94,7 +94,7 @@ MENU_Page*	MENU_PageBuffer_goNext(MENU_PageBuffer* buffer);
 
 MENU_Page*	MENU_PageBuffer_goPrevious(MENU_PageBuffer* buffer);
 
-volatile struct MENU_Menu
+struct MENU_Menu
 {
 	MENU_PageBuffer	  page_buffer_;
 	uint8_t			  options_count_;
@@ -107,7 +107,7 @@ typedef struct MENU_Menu MENU_Menu;
 
 void MENU_resetMenuView(MENU_Menu* const menu);
 
-volatile struct MENU_Message
+struct MENU_Message
 {
 	flash_string_array_t str_lines_;
 	uint8_t				 lines_nmbr_;

@@ -33,36 +33,33 @@
 
 void initTimer1()//pwm mode
 {
-	TIMER_16BitSetup setup = TIMER_16bit_DefaultSettings;
-	setup.mode_ = TIMER_16Bit_8BitFastPWM_Top;
+	TIMER_16BitSetup setup	  = TIMER_16bit_DefaultSettings;
+	setup.mode_				  = TIMER_16Bit_8BitFastPWM_Top;
 	setup.pins_under_control_ = TIMER_OnlyPinA;
-	setup.pin_A_mode_ = TIMER_CompareMatchClearPin;
-	setup.prescaler_ = TIMER_Synchronous_NoPrescaling;
+	setup.pin_A_mode_		  = TIMER_CompareMatchClearPin;
+	setup.prescaler_		  = TIMER_Synchronous_NoPrescaling;
 	TIMER_1_Init(setup,false);
 	DEV_Set_PWM(140);
-	/*
-	SET_BIT_AT(TCCR1A, COM1A1);
-	SET_BIT_AT(TCCR1A, WGM10);
-	SET_BIT_AT(TCCR1B, WGM12);
-	SET_BIT_AT(TCCR1B, CS10);
-	*/
 }
+
+#define PIN_0 0 
+#define PIN_1 1 
+#define PIN_2 2 
+#define PIN_3 3 
+#define PIN_5 5 
+#define PIN_7 7
 
 void GPIO_Init()
 {
-	/*
-	SET_BIT_AT(DDRB,DDB0);
-	SET_BIT_AT(DDRB,DDB1);
-	SET_BIT_AT(DDRB,DDB2);
-	SET_BIT_AT(DDRB,DDB3);
-	SET_BIT_AT(DDRB,DDB5);
+	PORT_setPinsAsOutput( PORT_CONFIG(B) ,
+						  PIN_0			 ,
+						  PIN_1			 ,
+						  PIN_2			 ,
+						  PIN_3			 ,
+						  PIN_5);
 	
-	SET_BIT_AT(PORTB,DDB2);//ss
-	SET_BIT_AT(DDRD,DDD7);
-	*/
-	PORT_setPinsAsOutput(PORT_CONFIG(B),0,1,2,3,5);
-	PORT_setPinAsOutput(PORT_CONFIG(D),7);
-	PORT_setPinHigh(PORT_STATE(B),2);
+	PORT_setPinAsOutput(PORT_CONFIG(D) , PIN_7);
+	PORT_setPinHigh(PORT_STATE(B) , PIN_2 );
 }
 
 void spi_init()
@@ -82,17 +79,4 @@ void Config_Init()
 	GPIO_Init();
 	initTimer1();
     spi_init();
-	 
-	 /*
-	 SET_BIT_AT(SPCR0, CPOL);
-	 SET_BIT_AT(SPCR0, CPHA);
-     
-	 CLEAR_BIT_AT(SPCR0, DORD);
-	 
-	 SET_BIT_AT(SPSR0, SPI2X);//2 x faster spi
-	 
-     SET_BIT_AT(SPCR0, MSTR);
-	 SET_BIT_AT(SPCR0, SPE);
-	 */
-     
 }
