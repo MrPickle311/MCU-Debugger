@@ -44,7 +44,7 @@ byte_t FRAM_readRandomByte(large_length_t address)
 {
 	TWI1_startSequence_NoACK();
 	TWI1_sendDeviceAddressForSending_NoACK(FRAM_ADR);
-	TWI1_sendByte_NoACK((byte_t)(address >> 8));//zmien na ack ,jesli pojawia sie klopoty
+	TWI1_sendByte_NoACK((byte_t)(address >> 8));
 	TWI1_sendByte_NoACK((byte_t)(address));
 	TWI1_stopSequence();
 	
