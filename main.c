@@ -19,6 +19,7 @@
 #include "program/com.h"
 #include "tests/fram_buffer_test.h"
 #include <avr/pgmspace.h>
+#include "program/test_framework/unit_tests.h"
 
 volatile address_16bit_t fram_push_adr = {0x0};
 volatile address_16bit_t fram_pop_adr  = {0x0};
@@ -92,7 +93,6 @@ int main(void)
 	//MENU_clearArea(&(MENU_Area){ (MENU_Point){0,0}, (MENU_Point){19, 19} });
 	_delay_ms(300);
 	sei();
-	
 	
 	MENU_startApplication();
 	
