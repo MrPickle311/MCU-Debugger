@@ -6,8 +6,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "../../drivers/core/bit_utils.h"
-#include "framework_flash_strings.h"
-
+#include "../../drivers/core/global_utils.h"
 
 #define TEST_UART_SEND_TXT(txt_ptr)	
 #define TEST_UART_SEND_BYTE(byte)	
@@ -15,34 +14,34 @@
 enum GlobalCommand{ START					 = 0 ,
 					SENDING_TEST_CASE        = 1 ,
 					SENDING_UNIT_TEST_RESULT = 2 ,
-					END_ENTIRE_TRANSACTION   = 3 };
+					END_SENDING_TEST_CASE    = 3 ,
+					END_ENTIRE_TRANSACTION   = 4 };
 
-enum TestCaseCommand{ SENDING_NAME			  = 0,
-					  SENDING_TYPE_DESCRIPTOR = 1,
-					  SENDING_CURRENT_VALUE   = 2,
-					  SENDING_EXPECTED_VALUE  = 3,
-					  SENDING_TEST_RESULT     = 4,
-					  SENDING_LINE_NMBR		  = 5,
-					  END_SENDING_TEST		  = 6 };
+enum TestCaseCommand{ SENDING_NAME					= 0 ,
+                      SENDING_TYPE_DESCRIPTOR		= 1 ,
+                      SENDING_CURRENT_VALUE			= 2 ,
+                      SENDING_EXPECTED_VALUE		= 3 ,
+                      SENDING_TEST_RESULT			= 4 ,
+                      SENDING_LINE_NMBR				= 5 ,
+                      SENDING_LOWER_VALUE           = 6 ,
+                      SENDING_UPPER_VALUE           = 7 ,
+                      END_SENDING_UNIT_TEST_RESULT	= 8 };
 
-enum TypeDescriptor{ UINT8_T  = 0 , 
-					 UINT16_T = 1 , 
-					 UINT32_T = 2 , 
-					 UINT64_T = 3 , 
-					 
-					 INT8_T   = 4 , 
-					 INT16_T  = 5 , 
-					 INT32_T  = 6 , 
-					 INT64_T  = 7 ,
-					 
-					 BOOL     = 8 , 
-					 CHAR     = 9 ,
+enum TypeDescriptor{ UINT8_T  = 0  , 
+					 UINT16_T = 1  , 
+					 UINT32_T = 2  , 
+					 UINT64_T = 3  , 
+					 			   
+					 INT8_T   = 4  , 
+					 INT16_T  = 5  , 
+					 INT32_T  = 6  , 
+					 INT64_T  = 7  ,
+					 			   
+					 BOOL     = 8  , 
+					 CHAR     = 9  ,
+					 PTR	  = 10 ,
+					 BIT	  = 11 , 
 					 TYPES_COUNT};
-
-
-extern const __flash uint8_t arrai[TYPES_COUNT];
-
-#define GET_EXPRESSION_NAME(expression,target)	sprintf(target, "%s",expression)
 
 //generic
 
@@ -70,72 +69,24 @@ void uartSendTestResult(bool is_passed);
 
 void uartSendLineNumber(uint16_t line_nmbr);
 
-void uartTerminateSendingTestCase();
+void uartTerminateSendingUnitTestResult();
+
+void uartSendLowerValue(void* lower_value, uint8_t value_size);
+
+void uartSendUpperValue(void* lower_value, uint8_t value_size);
 
 //specific in unit test END
 
-/*
+//compressed functions
 
-#define DEFINE_TEST_RESULT(type)\
-struct TEST_RESULT_##type \
-{\
-	const char __memx*  expresion_name_; \
-	enum TypeDescriptor	type_descriptor_; \
-	type			    current_value_; \
-	type			    expected_value_; \
-	bool			    is_test_passed_; \
-	uint16_t		    line_nmbr_; \
-};\
-typedef struct TEST_RESULT_##type TEST_RESULT_##type;
+void uartSendUnitTestResultHeader( const char __memx* name , enum TypeDescriptor descrpitor );
 
+void uartSendUnitTestResultValues(void* current_value , void* expected_value ,uint8_t value_size );
 
-DEFINE_TEST_RESULT(uint8_t);
-DEFINE_TEST_RESULT(uint16_t);
-DEFINE_TEST_RESULT(uint32_t);
-DEFINE_TEST_RESULT(uint64_t);
-DEFINE_TEST_RESULT(int8_t);
-DEFINE_TEST_RESULT(int16_t);
-DEFINE_TEST_RESULT(int32_t);
-DEFINE_TEST_RESULT(int64_t);
-DEFINE_TEST_RESULT(bool);
-DEFINE_TEST_RESULT(char);
+void uartSendValueRange(void* lower_value , void* upper_value , uint8_t value_size);
 
-void* allocateUnitTestResult(const char __memx*		expresion_name	,
-							 enum TypeDescriptor	type_descriptor ,
-							 void*					current_value   ,
-							 void*					expected_value  ,
-							 bool					is_test_passed  ,
-							 uint16_t				line_nmbr		
-							 );
+bool checkCondition(bool condition);
 
-struct UNIT_TEST
-{
-	void*			  test_results_;
-	struct UNIT_TEST* next_test_;
-};
-
-typedef struct UNIT_TEST UNIT_TEST;
-
-struct TEST_CASE_RESULT
-{
-	const char __memx* test_case_name_;
-	uint8_t			   unit_tests_count_;
-	UNIT_TEST*		   current_unit_test_;
-	UNIT_TEST*		   unit_test_head_;
-}current_test_case;
-
-typedef struct TEST_CASE_RESULT TEST_CASE_RESULT;
-
-void initTestCaseResult(TEST_CASE_RESULT* test_case_result , const char __memx* test_case_name);
-
-void clearTestCaseResult(TEST_CASE_RESULT* test_case_result);
-
-void sendResultPackage(TEST_CASE_RESULT*   test_case_result);
-
-void pushNewUnitTest( TEST_CASE_RESULT*   test_case_result , 
-					  UNIT_TEST*		  unit_test );
-
-*/
 
 #define TEST_INIT()\
 		uartSendGlobalCommand(START)
@@ -145,114 +96,188 @@ void pushNewUnitTest( TEST_CASE_RESULT*   test_case_result ,
 
 #define EXAMINE_TEST_CASE(name)\
 		uartSendGlobalCommand(SENDING_TEST_CASE);\
-		uartSendText( PSTR( ##name ) );\
+		uartSendText( PSTR( #name ) );\
 		name();
 
-#define TEST_END()\
+#define TEST_CASE_END()\
+		uartSendGlobalCommand(END_SENDING_TEST_CASE)
+
+#define TEST_PROTOCOL_END()\
 		uartSendGlobalCommand(END_ENTIRE_TRANSACTION)
 
 
+#define BOOL_BODY(expression, expected_value)\
+		uartSendUnitTestResultHeader( PSTR( #expression ) , BOOL );\
+		uartSendUnitTestResultValues( &(bool){expression} , &(bool){true} , sizeof(bool) );\
+		uartSendTestResult( checkCondition( expression == expected_value ) );\
+		uartTerminateSendingUnitTestResult()
+		
+#define EXPECT_TRUE(expression) BOOL_BODY(expression , true)
+		
+#define EXPECT_FALSE(expression) BOOL_BODY(expression , false)
 
-#define EXPECT_TRUE(expression)\
-	if(expression)
+
+#define COMPARISON_BODY( expression , expected_value , type_descriptor , type , operator)\
+		uartSendUnitTestResultHeader( PSTR( #expression ) , type_descriptor );\
+		uartSendUnitTestResultValues( &(type){expression} , &(type){expected_value} , sizeof(type) );\
+		uartSendTestResult( checkCondition( expression operator expected_value ) );\
+		uartTerminateSendingUnitTestResult()
+
+#define EXPECT_EQUAL( expression , expected_value , type_descriptor , type )\
+		COMPARISON_BODY( expression , expected_value , type_descriptor , type , ==)
+
+#define EXPECT_NOT_EQUAL( expression , expected_value , type_descriptor , type )\
+		COMPARISON_BODY( expression , expected_value , type_descriptor , type , !=)
 
 
-/**
- * @Macro:       UCUNIT_Check(condition, msg, args)
- *
- * @Description: Checks a condition and prints a message.
- *
- * @Param msg:   Message to write.
- * @Param args:  Argument list as string
- *
- * @Remarks:     Basic check. This macro is used by all higher level checks.
- *
- */
-#define UCUNIT_Check(condition, msg, args)             \
-    if ( (condition) ) { UCUNIT_PassCheck(msg, args); } else { UCUNIT_FailCheck(msg, args); }
 
-/**
- * @Macro:       UCUNIT_CheckIsEqual(expected,actual)
- *
- * @Description: Checks that actual value equals the expected value.
- *
- * @Param expected: Expected value.
- * @Param actual: Actual value.
- *
- * @Remarks:     This macro uses UCUNIT_Check(condition, msg, args).
- *
- */
-#define UCUNIT_CheckIsEqual(expected,actual)         \
-    UCUNIT_Check( (expected) == (actual), "IsEqual", #expected "," #actual )
+//optimization
+#define PTR_SIZE	 1
+#define PTR_NOT_NULL 1
+#define PTR_NULL	 0
 
-/**
- * @Macro:       UCUNIT_CheckIsNull(pointer)
- *
- * @Description: Checks that a pointer is NULL.
- *
- * @Param pointer: Pointer to check.
- *
- * @Remarks:     This macro uses UCUNIT_Check(condition, msg, args).
- *
- */
-#define UCUNIT_CheckIsNull(pointer)                  \
-    UCUNIT_Check( (pointer) == NULL, "IsNull", #pointer)
+#define NULL_BODY( expression , expected , operator )\
+		uartSendUnitTestResultHeader( PSTR( #expression ) , PTR );\
+		uartSendExpectedValue( expected , PTR_SIZE );\
+		uartSendTestResult( checkCondition( expression operator NULL ) );\
+		uartTerminateSendingUnitTestResult()
 
-/**
- * @Macro:       UCUNIT_CheckIsNotNull(pointer)
- *
- * @Description: Checks that a pointer is not NULL.
- *
- * @Param pointer: Pointer to check.
- *
- * @Remarks:     This macro uses UCUNIT_Check(condition, msg, args).
- *
- */
-#define UCUNIT_CheckIsNotNull(pointer)               \
-    UCUNIT_Check( (pointer) != NULL, "IsNotNull", #pointer)
+//pointers
 
-/**
- * @Macro:       UCUNIT_CheckIsInRange(value, lower, upper)
- *
- * @Description: Checks if a value is between lower and upper bounds (inclusive)
- *               Mathematical: lower <= value <= upper
- *
- * @Param value: Value to check.
- * @Param lower: Lower bound.
- * @Param upper: Upper bound.
- *
- * @Remarks:     This macro uses UCUNIT_Check(condition, msg, args).
- *
- */
-#define UCUNIT_CheckIsInRange(value, lower, upper)   \
-    UCUNIT_Check( ( (value>=lower) && (value<=upper) ), "IsInRange", #value "," #lower "," #upper)
+#define EXPECT_NULL( expression ) NULL_BODY(expression , PTR_NULL  , ==)
 
-/**
- * @Macro:       UCUNIT_CheckIs8Bit(value)
- *
- * @Description: Checks if a value fits into 8-bit.
- *
- * @Param value: Value to check.
- *
- * @Remarks:     This macro uses UCUNIT_Check(condition, msg, args).
- *
- */
+#define EXPECT_NOT_NULL( expression ) NULL_BODY(expression , PTR_NOT_NULL , !=)
 
-#define UCUNIT_CheckIsBitSet(value, bitno) \
-    UCUNIT_Check( (1==(((value)>>(bitno)) & 0x01) ), "IsBitSet", #value "," #bitno)
+//pointers END
 
-/**
- * @Macro:       UCUNIT_CheckIsBitClear(value, bitno)
- *
- * @Description: Checks if a bit is not set in value.
- *
- * @Param value: Value to check.
- * @Param bitno: Bit number. The least significant bit is 0.
- *
- * @Remarks:     This macro uses UCUNIT_Check(condition, msg, args).
- *
- */
-#define UCUNIT_CheckIsBitClear(value, bitno) \
-    UCUNIT_Check( (0==(((value)>>(bitno)) & 0x01) ), "IsBitClear", #value "," #bitno)
+//equality
+
+#define EXPECT_EQUAL_uint8_t( expression , expected_value )\
+		EXPECT_EQUAL( expression , expected_value , UINT8_T , uint8_t )
+
+#define EXPECT_EQUAL_uint16_t( expression , expected_value )\
+		EXPECT_EQUAL( expression , expected_value , UINT16_T , uint16_t )
+
+#define EXPECT_EQUAL_uint32_t( expression , expected_value )\
+		EXPECT_EQUAL( expression , expected_value , UINT32_T , uint32_t )
+
+#define EXPECT_EQUAL_uint64_t( expression , expected_value )\
+		EXPECT_EQUAL( expression , expected_value , UINT64_T , uint64_t )
+
+
+
+#define EXPECT_EQUAL_int8_t( expression , expected_value )\
+		EXPECT_EQUAL( expression , expected_value , INT8_T ,  int8_t )
+
+#define EXPECT_EQUAL_int16_t( expression , expected_value )\
+		EXPECT_EQUAL( expression , expected_value , INT16_T , int16_t )
+
+#define EXPECT_EQUAL_int32_t( expression , expected_value )\
+		EXPECT_EQUAL( expression , expected_value , INT32_T , int32_t )
+
+#define EXPECT_EQUAL_int64_t( expression , expected_value )\
+		EXPECT_EQUAL( expression , expected_value , INT64_T , int64_t )
+		
+
+
+#define EXPECT_NOT_EQUAL_char( expression , expected_value )\
+		EXPECT_NOT_EQUAL( expression , expected_value , CHAR , char )
+
+
+#define EXPECT_NOT_EQUAL_uint8_t( expression , expected_value )\
+		EXPECT_NOT_EQUAL( expression , expected_value , UINT8_T , uint8_t )
+
+#define EXPECT_NOT_EQUAL_uint16_t( expression , expected_value )\
+		EXPECT_NOT_EQUAL( expression , expected_value , UINT16_T , uint16_t )
+
+#define EXPECT_NOT_EQUAL_uint32_t( expression , expected_value )\
+		EXPECT_NOT_EQUAL( expression , expected_value , UINT32_T , uint32_t )
+
+#define EXPECT_NOT_EQUAL_uint64_t( expression , expected_value )\
+		EXPECT_NOT_EQUAL( expression , expected_value , UINT64_T , uint64_t )
+
+
+
+#define EXPECT_NOT_EQUAL_int8_t( expression , expected_value )\
+		EXPECT_NOT_EQUAL( expression , expected_value , INT8_T ,  int8_t )
+
+#define EXPECT_NOT_EQUAL_int16_t( expression , expected_value )\
+		EXPECT_NOT_EQUAL( expression , expected_value , INT16_T , int16_t )
+
+#define EXPECT_NOT_EQUAL_int32_t( expression , expected_value )\
+		EXPECT_NOT_EQUAL( expression , expected_value , INT32_T , int32_t )
+
+#define EXPECT_NOT_EQUAL_int64_t( expression , expected_value )\
+		EXPECT_NOT_EQUAL( expression , expected_value , INT64_T , int64_t )
+		
+
+
+#define EXPECT_NOT_EQUAL_char( expression , expected_value )\
+		EXPECT_NOT_EQUAL( expression , expected_value , CHAR , char )	
+
+//equality END
+
+//range checking 
+
+
+#define RANGE_BODY(expression, lower , upper , type_descriptor , type )\
+        uartSendUnitTestResultHeader(  #expression  , type_descriptor );\
+        uartSendCurrentValue(&(type){expression}, sizeof(type));\
+        uartSendValueRange( &(type){lower} , &(type){upper} , sizeof(type));\
+        uartSendTestResult( checkCondition( ( expression >= lower ) && ( expression <= upper ) ) );\
+        uartTerminateSendingUnitTestResult()
+
+#define EXPTECT_IN_RANGE_uint8_t(expression, lower , upper)\
+		RANGE_BODY(expression, lower , upper, UINT8_T , uint8_t)
+
+#define EXPTECT_IN_RANGE_uint16_t(expression, lower , upper)\
+		RANGE_BODY(expression, lower , upper, UINT16_T , uint16_t)
+
+#define EXPTECT_IN_RANGE_uint32_t(expression, lower , upper)\
+		RANGE_BODY(expression, lower , upper, UINT32_T , uint32_t)
+		
+#define EXPTECT_IN_RANGE_uint64_t(expression, lower , upper)\
+		RANGE_BODY(expression, lower , upper, UINT64_T , uint64_t)
+
+
+#define EXPTECT_IN_RANGE_int8_t(expression, lower , upper)\
+		RANGE_BODY(expression, lower , upper, INT8_T , int8_t)
+
+#define EXPTECT_IN_RANGE_int16_t(expression, lower , upper)\
+		RANGE_BODY(expression, lower , upper, INT16_T , int16_t)
+
+#define EXPTECT_IN_RANGE_int32_t(expression, lower , upper)\
+		RANGE_BODY(expression, lower , upper, INT32_T , int32_t)
+		
+#define EXPTECT_IN_RANGE_int64_t(expression, lower , upper)\
+		RANGE_BODY(expression, lower , upper, INT64_T , int64_t)
+		
+#define EXPTECT_IN_RANGE_char(expression, lower , upper)\
+		RANGE_BODY(expression, lower , upper, CHAR , char)
+		
+
+//end range checking 
+
+//cheking bit set/clear
+
+
+#define BIT_SIZE	1//althought it is in-byte size
+#define BIT_SET		1
+#define BIT_CLEARED 0
+
+#define BIT_BODY(expression , expected , bit_nmbr , EXPECTED_STATE_CHECKER )\
+		uartSendUnitTestResultHeader( PSTR( #expression ) , BIT );\
+		uartSendExpectedValue( &(uint8_t){expected} , BIT_SIZE );\
+		uartSendTestResult( checkCondition( EXPECTED_STATE_CHECKER( expression , bit_nmbr ) ) );\
+		uartTerminateSendingUnitTestResult()
+
+#define EXPECT_BIT_SET(expression  , bit_nmbr)\
+		BIT_BODY(expression , BIT_SET , bit_nmbr, IS_BIT_SET_AT )
+
+#define EXPECT_BIT_CLEAR(expression  , bit_nmbr)\
+		BIT_BODY(expression , BIT_CLEARED , bit_nmbr, IS_BIT_CLEARED_AT )
+		
+
+//cheking bit set/clear END
 
 #endif /*UNIT_TESTS_*/

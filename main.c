@@ -76,6 +76,53 @@ void wipeFRAM()
 		FRAM_writeSingleByte(0,i);
 }
 
+_Bool g()
+{
+	return false;
+}
+
+uint8_t bb(uint8_t j)
+{
+	return 2;
+}
+
+bool xd()
+{
+	return true;
+}
+
+TEST_CASE(test1)
+{
+	EXPECT_TRUE(xd());
+
+	uint32_t xc = 433;
+	EXPECT_EQUAL_uint32_t(xc,433);
+
+	int64_t openmb = -343434;
+
+	EXPECT_EQUAL_uint64_t(openmb,433);
+
+	uint16_t reg = 0b10000000;
+
+	EXPECT_BIT_SET(reg,7);
+
+	uint16_t* ptr = NULL;
+
+	EXPECT_NULL(ptr);
+
+	TEST_CASE_END();
+}
+
+TEST_CASE(test2)
+{
+	int16_t dfname = 67;
+
+	EXPTECT_IN_RANGE_int16_t(dfname,-7,5090);
+
+
+	TEST_CASE_END();
+}
+
 int main(void)
 {
 	configurePORTS();
@@ -95,6 +142,16 @@ int main(void)
 	sei();
 	
 	MENU_startApplication();
+	
+	//
+	
+	TEST_INIT();
+	EXAMINE_TEST_CASE(test1);
+	EXAMINE_TEST_CASE(test2);
+
+	TEST_PROTOCOL_END();
+	
+	//
 	
 	//fram_test1();
 	//fram_test2();
