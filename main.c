@@ -19,7 +19,6 @@
 #include "program/com.h"
 #include "tests/fram_buffer_test.h"
 #include <avr/pgmspace.h>
-#include "program/test_framework/unit_tests.h"
 
 volatile address_16bit_t fram_push_adr = {0x0};
 volatile address_16bit_t fram_pop_adr  = {0x0};
@@ -51,7 +50,7 @@ void configureLCD()
 	 LCD_Clear(0xffff);
 	 Paint_NewImage(LCD_WIDTH, LCD_HEIGHT, 0, BLACK);
 	 Paint_Clear(BLACK);
-	 //Paint_DrawString_EN(20,180, "Welcome to Debugger",  &Font16, BLACK, WHITE);
+	 Paint_DrawString_EN(20,180, "Welcome to Debugger",  &Font16, BLACK, WHITE);
 }
 
 void configurePORTS()
@@ -76,53 +75,6 @@ void wipeFRAM()
 		FRAM_writeSingleByte(0,i);
 }
 
-_Bool g()
-{
-	return false;
-}
-
-uint8_t bb(uint8_t j)
-{
-	return 2;
-}
-
-bool xd()
-{
-	return true;
-}
-
-TEST_CASE(test1)
-{
-	EXPECT_TRUE(xd());
-
-	uint32_t xc = 433;
-	EXPECT_EQUAL_uint32_t(xc,433);
-
-	int64_t openmb = -343434;
-
-	EXPECT_EQUAL_uint64_t(openmb,433);
-
-	uint16_t reg = 0b10000000;
-
-	EXPECT_BIT_SET(reg,7);
-
-	uint16_t* ptr = NULL;
-
-	EXPECT_NULL(ptr);
-
-	TEST_CASE_END();
-}
-
-TEST_CASE(test2)
-{
-	int16_t dfname = 67;
-
-	EXPTECT_IN_RANGE_int16_t(dfname,-7,5090);
-
-
-	TEST_CASE_END();
-}
-
 int main(void)
 {
 	configurePORTS();
@@ -131,27 +83,10 @@ int main(void)
 	configureLCD();
 	configureDebouncingTimer();
 	
-	//for(uint8_t i= 0 ; i < 20 ; ++i)
-	//	MENU_printTextLine(PSTR("XXXXXXXXXXXXXXXXXXXX"), &ENTIRE_LINE , 0 ,i , NOT_SELECTED);
-	//
-	//for(uint8_t i= 0 ; i < 20 ; ++i)
-	//	MENU_printTextLine(PSTR("                    "), &ENTIRE_LINE , 0 ,i , NOT_SELECTED);
-	
-	//MENU_clearArea(&(MENU_Area){ (MENU_Point){0,0}, (MENU_Point){19, 19} });
 	_delay_ms(300);
 	sei();
 	
 	MENU_startApplication();
-	
-	//
-	
-	TEST_INIT();
-	EXAMINE_TEST_CASE(test1);
-	EXAMINE_TEST_CASE(test2);
-
-	TEST_PROTOCOL_END();
-	
-	//
 	
 	//fram_test1();
 	//fram_test2();
