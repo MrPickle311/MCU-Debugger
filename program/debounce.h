@@ -13,6 +13,7 @@
 #define BUTTON_PIN PIND
 #define BUTTON_DDR DDRD
 
+//This solutuion is based on https://www.avrfreaks.net/sites/default/files/forum_attachments/debounce.pdf
 
 #define RIGHT_BUTTON_MASK	( BIT_MASK_OF(DDD3) )
 #define LEFT_BUTTON_MASK	( BIT_MASK_OF(DDD4) )

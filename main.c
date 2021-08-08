@@ -26,8 +26,8 @@ volatile uint8_t		 data_transfer_flag =  0;//0 -transfer off, 1 - transfer on
 
 void configureTWISlave()
 {
-	TWI_Slave_Setup setup;
-	setup.buffer_size_ = 100;
+	TWI_Slave_Setup setup;//setup object
+	setup.buffer_size_ = 100;// hold 100 bytes 
 	setup.device_address_ = DEBUGGER_ADR;//not shifted
 	setup.device_address_mask_ = 0x0;
 	TWI0_Slave_init(setup);
